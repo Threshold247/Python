@@ -8,9 +8,9 @@ question_bank = []
 for items in question_data:
     # returns a dictionary
     # access the text value
-    text = items['text']
+    text = items['question']
     # access the answer value
-    answer = items['answer']
+    answer = items['correct_answer']
     # create a new question model with a text and answer
     new_q = Question(text=text, answer=answer)
     # append new model to the empty list
@@ -23,11 +23,5 @@ quiz = QuizBrain(question_bank)
 while quiz.still_has_questions():
     # generates a new question
     quiz.next_question()
-
-
-
-
-
-
-
-
+print("Game completed")
+print(f"Your final score is: {quiz.score}/{quiz.question_no}")
