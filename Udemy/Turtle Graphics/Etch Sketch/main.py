@@ -1,4 +1,3 @@
-import turtle
 from turtle import Turtle, Screen
 
 tim = Turtle()
@@ -18,17 +17,17 @@ def move_backward():
 
 
 def turn_left():
-    tim.lt(5)
+    tim.lt(10)
 
 
 def turn_right():
-    tim.rt(5)
+    tim.rt(10)
 
 
 def clear():
     tim.pu()
-    tim.home()
     tim.clear()
+    tim.home()
     tim.pd()
 
 
