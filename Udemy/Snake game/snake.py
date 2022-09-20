@@ -1,6 +1,5 @@
-from turtle import Turtle, Screen
+from turtle import Turtle
 
-screen = Screen()
 MOVE_DISTANCE = 20
 RIGHT = 0
 UP = 90
@@ -60,5 +59,3 @@ class Snake:
     def down(self):
         if self.head.heading() != UP:
             self.head.setheading(DOWN)
-
-

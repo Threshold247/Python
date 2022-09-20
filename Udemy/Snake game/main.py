@@ -1,6 +1,9 @@
 from turtle import Screen
+from random import randint
 import time
 from snake import Snake
+from food import Food
+
 screen = Screen()
 
 # setup screen
@@ -12,6 +15,8 @@ screen.title("My snake game")
 screen.tracer(0)
 #   create snake class
 snake = Snake()
+#   create food class
+food = Food()
 #  initialise event listener
 screen.listen()
 screen.onkey(snake.right, key="Right")
@@ -27,7 +32,10 @@ while game_is_on:
     # add delay
     time.sleep(0.2)
     snake.move_snake()
-
+    # detect collision wih food by using distance method from Turtle class
+    if snake.head.distance(food) < 15:
+        print("Yummy")
+        food.refresh()
 
 screen.exitonclick()
 
