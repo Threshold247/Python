@@ -36,12 +36,25 @@ while game_is_on:
     # detect collision wih food by using distance method from Turtle class
     if snake.head.distance(food) < 15:
         print("Yummy")
+        # place another piece of food
         food.refresh()
+        # add a segment onto the snake
+        snake.extend_snake()
+        # increase score
         scoreboard.increase_score()
     # detect collision with boundary wall
     if snake.head.xcor() > 280 or snake.head.xcor() < -280 or snake.head.ycor() > 280 or snake.head.ycor() < -280:
         game_is_on = False
         scoreboard.hit_wall()
 
-screen.exitonclick()
+    # detect collision with tail
+    for segment in snake.segments:
+        # excludes head segment from check
+        if segment == snake.head:
+            pass
+        # checks if head collides with all other segments
+        elif snake.head.distance(segment) < 10:
+            game_is_on = False
+            scoreboard.hit_wall()
 
+screen.exitonclick()

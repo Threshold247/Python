@@ -26,4 +26,4 @@ class Scoreboard(Turtle):
 
     def hit_wall(self):
         self.goto(0, 0)
-        self.write(f"GAME OVER. You hit the wall", align=SCOREBOARD_ALIGNMENT, font=SCOREBOARD_FONT)
+        self.write(f"GAME OVER", align=SCOREBOARD_ALIGNMENT, font=SCOREBOARD_FONT)

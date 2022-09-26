@@ -5,7 +5,7 @@ RIGHT = 0
 UP = 90
 LEFT = 180
 DOWN = 270
-
+STARTING_POSITION = [(0, 0), (-20, 0), (-40, 0)]
 
 class Snake:
 
@@ -18,19 +18,24 @@ class Snake:
         # setting up starting x-coordinate for each segment
         x_cord = 0
         # loop through 0 to 2
-        for snake_index in range(0, 3):
-            # setting up snake segment and changing shape to square
-            snake_segment = Turtle(shape="square")
-            # pen up so that no trail is left when segments move into position
-            snake_segment.pu()
-            # change segment colour to white
-            snake_segment.color("white")
-            # each segment with have a different x-coordinate
-            x_cord -= 20
-            # sending segment to different position based on loop
-            snake_segment.goto(x=x_cord, y=0)
-            # add each segment object to segment list
-            self.segments.append(snake_segment)
+        for position in STARTING_POSITION:
+            self.add_segment(position)
+
+    def add_segment(self, position):
+        # setting up snake segment and changing shape to square
+        snake_segment = Turtle(shape="square")
+        # pen up so that no trail is left when segments move into position
+        snake_segment.pu()
+        # change segment colour to white
+        snake_segment.color("white")
+        # sending segment to different position based on loop
+        snake_segment.goto(position)
+        # add each segment object to segment list
+        self.segments.append(snake_segment)
+
+    def extend_snake(self):
+        # add a new segment to the snake
+        self.add_segment(self.segments[-1].position())
 
     def move_snake(self):
         # looping through range. start point, end point, step parameter
