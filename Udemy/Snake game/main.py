@@ -47,13 +47,11 @@ while game_is_on:
         game_is_on = False
         scoreboard.hit_wall()
 
-    # detect collision with tail
-    for segment in snake.segments:
-        # excludes head segment from check
-        if segment == snake.head:
-            pass
+    # detect collision with tail, used slicing method to exclude first segment aka snake.head
+    for segment in snake.segments[1:]:
+
         # checks if head collides with all other segments
-        elif snake.head.distance(segment) < 10:
+        if snake.head.distance(segment) < 10:
             game_is_on = False
             scoreboard.hit_wall()
 
