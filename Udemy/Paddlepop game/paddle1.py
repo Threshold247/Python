@@ -1,10 +1,9 @@
-from turtle import Turtle, Screen
+from turtle import Turtle
 
-screen = Screen()
 MOVEMENT = 30
 
 
-class Paddle(Turtle):
+class Paddle1(Turtle):
 
     def __init__(self):
         super().__init__()
