@@ -20,5 +20,15 @@ while game_is_on:
     screen.update()
     car_manager.create_car()
     car_manager.car_move()
-
+    # detect collision with car
+    for car in car_manager.all_cars:
+        # loop through the list of cars and check if turtle is in close to car object
+        if car.distance(player) < 20:
+            # stop the game
+            game_is_on = False
+            print("Game over")
+    # detect if player gets across
+    if player.ycor() == 300:
+        game_is_on = False
+        print("you made it")
 screen.exitonclick()

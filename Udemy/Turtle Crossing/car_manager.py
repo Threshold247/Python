@@ -12,13 +12,13 @@ class CarManager:
     def create_car(self):
         # create random number between 1 and 6
         random_choice = randint(1, 6)
-        # if the random number is 1 then create a car
+        # if the random number is 1 then create a car to help create distance
         if random_choice == 1:
             # create car from Turtle class
             new_car = Turtle()
             # new does not leave behind trail
             new_car.pu()
-            # new car colour generated from array radomnly
+            # new car colour generated from array randomly
             new_car.color(choice(COLORS))
             # new car shape size
             new_car.shapesize(stretch_wid=1, stretch_len=2)
@@ -34,5 +34,5 @@ class CarManager:
     def car_move(self):
         # loop through the list
         for car in self.all_cars:
-            # each car will move at specific pace initially
+            # each car will move car backwards at specific distance initially
             car.bk(STARTING_MOVE_DISTANCE)
