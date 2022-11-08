@@ -11,7 +11,7 @@ screen.setup(width=800, height=600)
 screen.bgcolor("black")
 screen.title("Paddle pop game")
 screen.tracer(0)
-paddle_1 = Paddle((-350, 0), color= "white")
+paddle_1 = Paddle((-350, 0), color="white")
 paddle_2 = Paddle((350, 0), color="blue")
 ball = Ball()
 
