@@ -1,13 +1,15 @@
 from turtle import Turtle
 from random import choice, randint
-COLORS = ["red", "orange", "yellow", "green", "blue", "purple"]
+COLORS = ["red", "orange", "yellow", "white", "blue", "purple"]
 STARTING_MOVE_DISTANCE = 5
-MOVE_INCREMENT = 10
+MOVE_INCREMENT = 2
 
 
 class CarManager:
     def __init__(self):
         self.all_cars = []
+        # initialise the car speed to 5
+        self.speed = STARTING_MOVE_DISTANCE
 
     def create_car(self):
         # create random number between 1 and 6
@@ -35,4 +37,8 @@ class CarManager:
         # loop through the list
         for car in self.all_cars:
             # each car will move car backwards at specific distance initially
-            car.bk(STARTING_MOVE_DISTANCE)
+            car.bk(self.speed)
+
+    def increase_speed(self):
+        # increase movement speed
+        self.speed += MOVE_INCREMENT
