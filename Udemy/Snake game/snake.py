@@ -7,8 +7,8 @@ LEFT = 180
 DOWN = 270
 STARTING_POSITION = [(0, 0), (-20, 0), (-40, 0)]
 
-class Snake:
 
+class Snake:
 
     def __init__(self):
         self.segments = []
@@ -16,8 +16,8 @@ class Snake:
         self.head = self.segments[0]
 
     def create_snake(self):
-        # setting up starting x-coordinate for each segment
-        x_cord = 0
+        # setting up starting x co-ordinate for each segment
+        # x_cord = 0
         # loop through 0 to 2
         for position in STARTING_POSITION:
             self.add_segment(position)
@@ -37,6 +37,13 @@ class Snake:
     def extend_snake(self):
         # add a new segment to the snake
         self.add_segment(self.segments[-1].position())
+
+    def reset_snake(self):
+        for segment in self.segments:
+            segment.goto(1000, 1000)
+        self.segments.clear()
+        self.create_snake()
+        self.head = self.segments[0]
 
     def move_snake(self):
         # looping through range. start point, end point, step parameter

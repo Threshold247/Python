@@ -14,7 +14,7 @@ class Food(Turtle):
         # reduce size to 10 by 10
         self.shapesize(0.5, 0.5)
         # change colour
-        self.color("white")
+        self.color("blue")
         # increase speed
         self.speed("fastest")
         # set position randomly
