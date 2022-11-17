@@ -20,5 +20,6 @@ with open('./Input/Names/invited_names.txt') as file:
         # replace the name with the new name from invited name list
         new_letter = starting_letter.replace('[name]', strip_name)
         print(new_letter)
-        with open('./Output/ReadyToSend/letters.txt', mode="w") as file1:
+        # write each name to a text file of the same name
+        with open(f'./Output/ReadyToSend/letter_for_{strip_name}.txt', mode="w") as file1:
             file1.write(new_letter)
