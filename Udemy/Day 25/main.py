@@ -39,3 +39,4 @@ def fahrenheit(temp):
 monday_data = data[data.day == "Monday"]
 print(monday_data)
 print(fahrenheit(temp=monday_data.temp))
+
