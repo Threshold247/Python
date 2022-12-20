@@ -1,6 +1,5 @@
 import turtle
 import pandas as pd
-import re
 
 data = pd.read_csv("50_states.csv")
 
@@ -13,33 +12,48 @@ screen.addshape(image)
 
 turtle.shape(image)
 
-game_on = True
+states = data["state"].tolist()
+guessed_states = []
 
-while game_on:
+while len(guessed_states) < 50:
 
-    user_answer = screen.textinput(title="Guess the State", prompt="Can you guess another State")
-    check = data["state"].str.findall(user_answer, flags=re.IGNORECASE)
-    # if check returns True
-    for name in check:
-        if len(name) > 0:
-            # Search through DataFrame if there is a state that matches the input
-            answer = (data[data["state"] == name[0]])
-            print(f'original answer: {answer}')
-            # returns actual values in series
-            answer = answer.values
-            # navigate through list by indexing
-            print(f'converted answer: {answer}')
-            answer_list = answer[0]
-            print(f'answer in list: {answer_list}')
-            # convert value into integer
-            state_name = answer_list[0]
-            state_x_cord = float(answer_list[1])
-            state_y_cord = float(answer_list[2])
-            second_turtle.pu()
-            second_turtle.hideturtle()
-            second_turtle.goto(state_x_cord, state_y_cord)
-            second_turtle.write(state_name, align="center")
+    user_answer = screen.textinput(title=f"Guess the State {len(guessed_states)}/50",
+                                   prompt="Can you guess another State").title()
+
+    if user_answer == "Exit":
+        missing_state = []
+        # go through all states in list
+        for name in states:
+            # check if name is not in guessed_states list add it to missing_name list
+            if name not in guessed_states:
+                missing_state.append(name)
+        # create a dataframe
+        new_Dataframe = pd.DataFrame(missing_state)
+        # write dataframe to csv type
+        new_Dataframe.to_csv("states-to-learn.csv")
+        break
+
+    if user_answer in states:
+        guessed_states.append(user_answer)
+        second_turtle.pu()
+        second_turtle.hideturtle()
+        # go through data frame and check which state name matches with the user answer
+        state_data = data[data.state == user_answer]
+        # grab the x co-ordinate from the state
+        state_x_cord = int(state_data.x)
+        # grab the y co-ordinate from the state
+        state_y_cord = int(state_data.y)
+        # move the turtle the state co-ordinates
+        second_turtle.goto(state_x_cord, state_y_cord)
+        # write the name of the state. note you can't use the state name data. it incl extra info
+        second_turtle.write(user_answer, align="center")
+
+    if len(guessed_states) == 50:
+        print("You win!")
+
+
 # keeps the screen active
-turtle.mainloop()
+# turtle.mainloop()
+# states to learn
 
 
