@@ -22,12 +22,12 @@ while len(guessed_states) < 50:
     # title capitalize the input.
     if user_answer == "Exit":
         # create a list to store missing states
-        missing_state = []
+        missing_state = [name for name in states if name not in guessed_states]
         # go through all states in list
-        for name in states:
-            # check if name is not in guessed_states list add it to missing_name list
-            if name not in guessed_states:
-                missing_state.append(name)
+        # for name in states:
+        #     # check if name is not in guessed_states list add it to missing_name list
+        #     if name not in guessed_states:
+        #         missing_state.append(name)
         # create a dataframe
         new_Dataframe = pd.DataFrame(missing_state)
         # write dataframe to csv type
