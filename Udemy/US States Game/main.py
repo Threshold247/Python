@@ -19,8 +19,9 @@ while len(guessed_states) < 50:
 
     user_answer = screen.textinput(title=f"Guess the State {len(guessed_states)}/50",
                                    prompt="Can you guess another State").title()
-
+    # title capitalize the input.
     if user_answer == "Exit":
+        # create a list to store missing states
         missing_state = []
         # go through all states in list
         for name in states:
@@ -51,9 +52,6 @@ while len(guessed_states) < 50:
     if len(guessed_states) == 50:
         print("You win!")
 
-
 # keeps the screen active
 # turtle.mainloop()
 # states to learn
-
-
