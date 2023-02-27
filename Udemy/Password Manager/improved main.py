@@ -71,21 +71,27 @@ def save_info():
 
 # ---------------------------- SEARCH PASSWORD ------------------------------- #
 def search():
-    # try and except block to catch KeyError
+    # try and except block to catch File Not Found
     try:
+        website = website_entry.get()
         with open("data.json", mode="r") as file:
             # open and read old data from file
             data = json.load(file)
-            if len(website_entry.get().lower()) <= 0:
-                messagebox.showwarning(message="Website details cannot be empty")
-            # grab and find website entry and bring back the password value linked to website
-            else:
-                search_password = data[website_entry.get().lower()]["password"]
-    except KeyError:
-        messagebox.showwarning(message="Website details do not exit")
+    except FileNotFoundError:
+        messagebox.showwarning(message="No data file exists")
     else:
-        password_entry.insert(0, search_password)
-        messagebox.showinfo(message=f"Website: {website_entry.get()}\nPassword: {search_password}")
+        # loop through data and look for website name
+        if website in data:
+            email = data[website_entry.get().lower()]["email"]
+            password = data[website_entry.get().lower()]["password"]
+            # populate password entry if search successful
+            password_entry.insert(0, password)
+            # display message box if details are found
+            messagebox.showinfo(title=f"{website}",
+                                message=f"Email: {email}\nPassword: {password}")
+        # show error message if website entry is blank
+        elif len(website) <= 0:
+            messagebox.showwarning(message="Website details cannot be empty")
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
@@ -111,18 +117,19 @@ password_label.grid(row=3, column=0)
 # Entries
 website_entry = Entry(width=25)
 website_entry.focus()
-website_entry.grid(row=1, column=1, columnspan=2)
-email_entry = Entry(width=35)
+website_entry.grid(row=1, column=1)
+email_entry = Entry(width=25)
 email_entry.insert(0, "testemail@gmail.com")
-email_entry.grid(row=2, column=1, columnspan=2)
-password_entry = Entry(width=19)
+email_entry.grid(row=2, column=1)
+password_entry = Entry(width=25)
 password_entry.grid(row=3, column=1)
 
 # Buttons
+search_button = Button(text="Search", command=search)
+search_button.grid(row=1, column=2)
 password_button = Button(text="Create Password", command=generate)
 password_button.grid(row=3, column=2)
-add_button = Button(text="Add", width=30, command=save_info)
+add_button = Button(text="Add", width=35, command=save_info)
 add_button.grid(row=4, column=1, columnspan=2)
-search_button = Button(text="Search", command = search)
-search_button.grid(row=1, column=2, columnspan=2)
+
 window.mainloop()
