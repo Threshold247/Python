@@ -3,16 +3,21 @@ import pandas as pd
 import random
 
 BACKGROUND_COLOR = "#B1DDC6"
+# global dictionary to store French and English word
+word = {}
+words_to_learn = {}
 
 # Read data
 try:
-    data = pd.read_csv("data/french_words.csv")
-except FileNotFoundError:
     data = pd.read_csv("data/words_to_learn.csv")
-# Convert dataframe to list of dictionaries
-words_to_learn = data.to_dict(orient="records")
-# global dictionary to store French and English word
-word = {}
+
+except FileNotFoundError:
+    original_data = pd.read_csv("data/french_words.csv")
+    # Convert dataframe to list of dictionaries
+    words_to_learn = original_data.to_dict(orient="records")
+else:
+    words_to_learn = data.to_dict(orient="records")
+
 
 # ------ Random word -----#
 def random_word():
@@ -31,9 +36,13 @@ def random_word():
 
 
 def is_known():
+    # remove a word from the word_to_learn list every time you click on the known_btn
     words_to_learn.remove(word)
+    # create a new data frame
     new_data = pd.DataFrame(words_to_learn)
-    new_data.to_csv("data/words_to_learn.csv")
+    # convert data frame to csv
+    new_data.to_csv("data/words_to_learn.csv", index=False)
+    # generate a new French word
     random_word()
 
 def change_card():
@@ -77,7 +86,7 @@ known_btn.grid(row=1, column=1)
 incorrect_image = PhotoImage(file="images/wrong.png")
 unknown_btn = Button(image=incorrect_image, highlightthickness=0, command=random_word)
 unknown_btn.grid(row=1, column=0)
-
+# generate a new word
 random_word()
 
 window.mainloop()
