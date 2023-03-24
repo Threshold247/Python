@@ -25,5 +25,3 @@ def generate_alphabet():
 
 
 generate_alphabet()
-
-
