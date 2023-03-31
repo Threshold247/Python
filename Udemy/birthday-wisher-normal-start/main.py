@@ -16,37 +16,41 @@ my_password = "yifbdobttrghvnfl"
 # 2. Check if today matches a birthday in the birthdays.csv
 # HINT 1: Create a tuple from today's month and day using datetime. e.g.
 now = dt.datetime.now()
+# store today's month in a variable
 today_month = now.month
+# store today's day in a variable
 today_day = now.day
 # generate a tuple
 today = (today_month, today_day)
 
 
-# HINT 2: Use pandas to read the birthdays.csv
+# Use pandas to read the birthdays.csv
 birthday_data = pd.read_csv("birthdays.csv")
 
-# HINT 3: Use dictionary comprehension to create a dictionary from birthday.csv that is formatted like this:
+# Use dictionary comprehension to create a dictionary from birthday.csv that is formatted like this:
 # birthdays_dict = {
 #     (birthday_month, birthday_day): data_row
 # }
-#Dictionary comprehension template for pandas DataFrame looks like this:
+# Dictionary comprehension template for pandas DataFrame looks like this:
 birthday_dict = {(data_row.month, data_row.day): data_row for (index, data_row) in birthday_data.iterrows()}
-#e.g. if the birthdays.csv looked like this:
+# e.g. if the birthdays.csv looked like this:
 # name,email,year,month,day
 # Angela,angela@email.com,1995,12,24
-#Then the birthdays_dict should look like this:
+# Then the birthdays_dict should look like this:
 # birthdays_dict = {
 #     (12, 24): Angela,angela@email.com,1995,12,24
 # }
-
+# check to see if today's date is True
 if today in birthday_dict:
     # create variable to store name from object (consists of tuple-->today as the key)
     birthday_name = birthday_dict[today]["name"]
-    print(birthday_name)
-    letters = ["letter_1.txt", "letter_2.txt", "letter_3.txt"]
-    random_letter = rd.choice(letters)
-    with open(f"letter_templates/{random_letter}") as file:
+    # create variable to store email address from object (consists of tuple-->today as the key)
+    birthday_email = birthday_dict[today]["email"]
+    # open a randomly selected letter to open
+    with open(f"letter_templates/letter_{rd.randint(1,3)}.txt") as file:
+        # read the letter and store in a variable
         chosen_letter = file.read()
+        # replace [NAME] with the name of the birthday person
         birthday_letter = chosen_letter.replace("[NAME]", birthday_name)
         print(birthday_letter)
         with smtplib.SMTP("smtp.gmail.com") as connection:
@@ -56,17 +60,21 @@ if today in birthday_dict:
             connection.login(user=my_email, password=my_password)
             # sending email from sender to recipient with message
             connection.sendmail(from_addr=my_email,
-                                to_addrs="threshold247@gmail.com",
+                                to_addrs=f"{birthday_email}",
                                 msg=f"Subject:Happy Birthday\n\n {birthday_letter}")
-# 3. If there is a match, pick a random letter (letter_1.txt/letter_2.txt/letter_3.txt) from letter_templates and replace the [NAME] with the person's actual name from birthdays.csv
+# 3. If there is a match, pick a random letter (letter_1.txt/letter_2.txt/letter_3.txt) from letter_templates and
+#    replace the [NAME] with the person's actual name from birthdays.csv
+
 # HINT 1: Think about the relative file path to open each letter. 
 # HINT 2: Use the random module to get a number between 1-3 to pick a random letter.
-# HINT 3: Use the replace() method to replace [NAME] with the actual name. https://www.w3schools.com/python/ref_string_replace.asp
+# HINT 3: Use the replace() method to replace [NAME] with the actual name.
+# https://www.w3schools.com/python/ref_string_replace.asp
 
 # 4. Send the letter generated in step 3 to that person's email address.
 # HINT 1: Gmail(smtp.gmail.com), Yahoo(smtp.mail.yahoo.com), Hotmail(smtp.live.com), Outlook(smtp-mail.outlook.com)
 # HINT 2: Remember to call .starttls()
-# HINT 3: Remember to login to your email service with email/password. Make sure your security setting is set to allow less secure apps.
+# HINT 3: Remember to login to your email service with email/password.
+# Make sure your security setting is set to allow less secure apps.
 # HINT 4: The message should have the Subject: Happy Birthday then after \n\n The Message Body.
 
 
