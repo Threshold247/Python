@@ -1,13 +1,16 @@
 import requests
 from twilio.rest import Client
+import os
+from dotenv import load_dotenv
+load_dotenv("test.env")
 
 # use api key from open weather
-my_api = "1f37375e6fbcffa4d75dfe1e7c7cb27a"
+my_api = os.getenv("OWA_API_KEY")
 # create variable to store api url
 OWA = "https://api.openweathermap.org/data/2.5/forecast"
-# parameters for the Clinet
+# parameters for the Client
 account_sid = "AC8e378b769f646cdbca7253c818014f1b"
-auth_token = "8e76a5f5a04b44f9b9ebb2feb8edb550"
+auth_token = os.getenv("TWILIO_TOKEN")
 # create variable to store longitude
 MY_LONG = 18.4232
 # create variable to store latitude
@@ -41,3 +44,5 @@ if will_rain:
         body="Bring an umbrella ☔",
         from_="+12705149754",
         to="+27679646165")
+    print(message.status)
+
