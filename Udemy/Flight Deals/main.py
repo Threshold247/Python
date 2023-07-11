@@ -6,7 +6,10 @@ from flight_search import FlightSearch
 
 my_datamanager = DataManager()
 my_datamanager.get_sheet_data()
-my_datamanager.add_data_to_sheet(8)
+
+
+# my_datamanager.add_data_to_sheet()
+
 
 
 
