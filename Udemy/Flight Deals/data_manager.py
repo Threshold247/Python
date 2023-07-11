@@ -19,13 +19,14 @@ class DataManager:
                 "lowestPrice": "1500"
             }
         }
-
+    # This method pulls data from Sheety using the Api
     def get_sheet_data(self):
         response = requests.get(url=self.data_endpoint, auth=(self.username, self.password))
         response.raise_for_status()
         data = response.json()
         print(data)
 
+    # This method adds data to Sheety using the Api
     def add_data_to_sheet(self, sheet_id):
         # Read documentation to put data in sheet
         response = requests.put(url=f"{self.data_endpoint}/{sheet_id}", auth=(self.username, self.password),
