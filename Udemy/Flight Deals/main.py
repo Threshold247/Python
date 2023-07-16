@@ -6,7 +6,9 @@ from flight_search import FlightSearch
 
 my_datamanager = DataManager()
 my_datamanager.get_sheet_data()
-
+my_datamanager.update_destination_codes()
+# flight_data = FlightSearch()
+# flight_data.get_country_code()
 
 # my_datamanager.add_data_to_sheet()
 
