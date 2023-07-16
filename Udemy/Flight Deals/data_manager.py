@@ -15,19 +15,15 @@ class DataManager:
         self.username = os.getenv("USER_NAME")
         self.password = os.getenv("USER_PASSWORD")
         self.data_endpoint = "https://api.sheety.co/9c07c3a2fc7f67032e447624ddb97123/flightDeals/prices"
-        # self.data_to_add = {
-        #     "price": {
-        #         "lowestPrice": "1900"
-        #     }
-        # }
 
     # This method pulls data from Sheety using the Api
     def get_sheet_data(self):
         response = requests.get(url=self.data_endpoint, auth=(self.username, self.password))
         response.raise_for_status()
-        data = response.json()['prices']
-        self.data = data
-        pprint(data)
+        data = response.json()
+        self.data = data['prices']
+        #pprint(data)
+        return self.data
 
     # add iata codes for each county listed in sheety
     def update_destination_codes(self):
@@ -37,15 +33,18 @@ class DataManager:
                     "iataCode": city["iataCode"]
                 }
             }
-            response = requests.put(url=f"{self.data_endpoint}/{['id']}",auth=(self.username, self.password),
+            response = requests.put(url=f"{self.data_endpoint}/{city['id']}", auth=(self.username, self.password),
                                     json=data_to_add)
             print(response.text)
+
     # This method adds data to Sheety using the Api
-    # def add_data_to_sheet(self):
-    #     # Read documentation to put data in sheet
-    #     response = requests.put(url=f"{self.data_endpoint}/{self.data.city['id']}", auth=(self.username, self.password),
-    #                             json=self.data_to_add)
-    #     print(response.text)
-
-
-
+    def add_data_to_sheet(self):
+        pass
+        # Read documentation to put data in sheet
+        # price_data =   "price": {
+        #         "lowestPrice": "1900"
+        #     }
+        # }
+        # response = requests.put(url=f"{self.data_endpoint}/{self.data['city']['id']}",
+        #                               auth=(self.username, self.password),json=price_data)
+        # print(response.text)

@@ -29,7 +29,7 @@ class FlightSearch:
         }
 
     def get_country_code(self, city_name):
-        flight = "https://api.tequila.kiwi.com/locations"
+        flight = "https://api.tequila.kiwi.com/locations/query"
         query = {
             "term": city_name,
             "location_types": "city",
@@ -37,8 +37,11 @@ class FlightSearch:
         }
         response = requests.get(url=flight, params=query, headers=self.headers)
         response.raise_for_status()
-        data = response.json()
-        pprint(data)
+        data = response.json()['locations']
+        print(f"data:{data}")
+        code = (data[0]["code"])
+        print(f"code:{code}")
+        return code
 
     def get_flight_data(self):
         response = requests.get(url=self.flight_url, params=self.params, headers=self.headers)
