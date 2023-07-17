@@ -1,28 +1,14 @@
+from flight_data import FlightData
 import os
 import requests
-from datetime import datetime
 from dotenv import load_dotenv
-from pprint import pprint
 load_dotenv(".env")
 
 
 class FlightSearch:
     # This class is responsible for talking to the Flight Search API.
     def __init__(self):
-        today = datetime.now()
-        current_date = today.strftime("%d/%m/%Y")
-        new_day = today.replace(day=16, month=7)
-        return_date = new_day.strftime("%d/%m/%Y")
-        # print(f"Current Date:{current_date}")
-        # print(f"Return Date:{return_date}")
         self.flight_url = "https://api.tequila.kiwi.com/v2/search"
-        self.params = {
-            "fly_from": "CPT",
-            "fly_to": "HND",
-            "date_from": current_date,
-            "date_to": return_date,
-            "curr": "ZAR"
-        }
         self.headers = {
             "apikey": os.getenv("KIWI_TOKEN"),
             "Content-Type": "application/json"
@@ -38,13 +24,41 @@ class FlightSearch:
         response = requests.get(url=flight, params=query, headers=self.headers)
         response.raise_for_status()
         data = response.json()['locations']
-        print(f"data:{data}")
+        # print(f"data:{data}")
         code = (data[0]["code"])
-        print(f"code:{code}")
+        # print(f"code:{code}")
         return code
 
-    def get_flight_data(self):
-        response = requests.get(url=self.flight_url, params=self.params, headers=self.headers)
+    def get_flight_data(self, departure_city_code, arrival_city_code, date_from, date_to):
+        query = {
+            "fly_from": departure_city_code,
+            "fly_to": arrival_city_code,
+            "date_from": date_from.strftime("%d/%m/%Y"),
+            "date_to": date_to.strftime("%d/%m/%Y"),
+            "nights_in_dst_from": 7,
+            "nights_in_dst_to": 28,
+            "flight_type": "round",
+            "one_for_city": 1,
+            "max_stopovers": 0,
+            "curr": "ZAR"
+        }
+        response = requests.get(url=self.flight_url, params=query, headers=self.headers)
         response.raise_for_status()
-        data = response.json()
-        pprint(data)
+
+        try:
+            data = response.json()['data'][0]
+        except IndexError:
+            print(f"No flights found for {arrival_city_code}.")
+            return None
+
+        flight_data = FlightData(
+            price=data['price'],
+            departure_city=data['route'][0]["cityFrom"],
+            departure_airport=data['route'][0]["flyFrom"],
+            destination_city=data['route'][0]["cityTo"],
+            destination_airport=data['route'][0]["flyTo"],
+            out_date= data['route'][0]['local_departure'].split("T")[0],
+            return_date=data['route'][1]['local_departure'].split("T")[0]
+        )
+        print(f"{flight_data.destination_city}: R{flight_data.price}")
+        return flight_data

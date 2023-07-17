@@ -22,7 +22,7 @@ class DataManager:
         response.raise_for_status()
         data = response.json()
         self.data = data['prices']
-        #pprint(data)
+        pprint(data)
         return self.data
 
     # add iata codes for each county listed in sheety
