@@ -24,6 +24,7 @@ if sheet_data[0]["iataCode"] == "":
     datamanager.update_destination_codes()
 
 today_date = datetime.now()
+# timedelta allows for days to be added to a date
 tomorrow_date = today_date + timedelta(days=1)
 return_date = today_date + timedelta(days=(30*6))
 
