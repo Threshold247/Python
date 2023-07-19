@@ -81,12 +81,13 @@ website_entry.grid(row=1, column=1, columnspan=2)
 email_entry = Entry(width=35)
 email_entry.insert(0, "testemail@gmail.com")
 email_entry.grid(row=2, column=1, columnspan=2)
-password_entry = Entry(width=19)
+password_entry = Entry(width=35)
 password_entry.grid(row=3, column=1)
 
 # Buttons
-password_button = Button(text="Create Password", command=generate)
-password_button.grid(row=3, column=2)
+password_button = Button(text="New Password", command=generate)
+# column should = 2. currently button overlaps with textbox
+password_button.grid(row=3, column=1, sticky="e")
 add_button = Button(text="Add", width=30, command=save_info)
 add_button.grid(row=4, column=1, columnspan=2)
 
