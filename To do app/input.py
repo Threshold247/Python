@@ -1,4 +1,6 @@
+import tkinter.scrolledtext
 from tkinter import *
+from database import Database
 
 window = Tk()
 window.title("Task app")
@@ -9,7 +11,7 @@ canvas = Canvas(width=200, height=200)
 task_image = PhotoImage(file="Image/task.png")
 canvas.create_image(100, 100, image=task_image)
 canvas.grid(row=0, column=0, columnspan=2)
-
+my_database = Database()
 
 def clear_description(event):
     description_entry.delete("0", "end")
@@ -47,7 +49,20 @@ add_reminder.grid(row=3, column=1)
 add_task = Button(bg="red", text="Add task")
 add_task.grid(row=4, columnspan=2)
 
+# Scroll bar
+scroll_bar = tkinter.scrolledtext.ScrolledText(width=35,  height=10)
 
+
+# Listbox
+listbox = Listbox(window, width=35)
+my_list = my_database.get_data()
+count = 0
+for item in my_list:
+    count += 1
+    description = item[1]
+    date = item[2]
+    listbox.insert(count, f"{description}: {date}")
+listbox.grid(row=5, columnspan=3)
 
 
 

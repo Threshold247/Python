@@ -21,11 +21,12 @@ class Database:
         cur = connection.cursor()
         cur.execute(sql)
         # print the number of rows
-        print(cur.rowcount)
+        # print(cur.rowcount)
         # print the data of each row.
         row = cur.fetchall()
-        print(row)
+        # print(row)
         cur.close()
+        return row
 
     def get_row_id(self):
         sql = '''SELECT * FROM tasks'''
