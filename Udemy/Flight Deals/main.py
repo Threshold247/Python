@@ -36,8 +36,9 @@ for destination in sheet_data:
                                                 arrival_city_code=destination['iataCode'],
                                                 date_from=tomorrow_date,
                                                 date_to=return_date)
-
+    # flight search price is lower than the google sheet price
     if flight_data.price < destination['lowestPrice']:
+        # run the notification method with a custom message argument
         notification.send_sms(message=
                               f"Flight Alert! Pay R{flight_data.price} to "
                               f"fly from {flight_data.departure_city}-{flight_data.departure_airport}"
