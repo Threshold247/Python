@@ -60,7 +60,7 @@ class FlightSearch:
             out_date= data['route'][0]['local_departure'].split("T")[0],
             return_date=data['route'][1]['local_departure'].split("T")[0]
         )
-        print(f"FLight Alert! Pay R{flight_data.price} to fly from {flight_data.departure_city}-{departure_city_code} "
+        print(f"Flight Alert! Pay R{flight_data.price} to fly from {flight_data.departure_city}-{departure_city_code} "
               f"to{flight_data.destination_city}-{arrival_city_code} from {flight_data.out_date} "
               f"to {flight_data.return_date}")
         return flight_data

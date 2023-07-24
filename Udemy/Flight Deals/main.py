@@ -2,6 +2,7 @@
 # FlightSearch, FlightData, NotificationManager classes to achieve the program requirements.
 from data_manager import DataManager
 from flight_search import FlightSearch
+from notification_manager import NotificationManager
 from datetime import datetime, timedelta
 from pprint import pprint
 
@@ -10,6 +11,8 @@ datamanager = DataManager()
 sheet_data = datamanager.get_sheet_data()
 pprint(sheet_data)
 flight_search = FlightSearch()
+notification = NotificationManager()
+
 ORIGIN_CITY_IATA = "LON"
 
 # if column is empty check for the IATA code
@@ -33,6 +36,15 @@ for destination in sheet_data:
                                                 arrival_city_code=destination['iataCode'],
                                                 date_from=tomorrow_date,
                                                 date_to=return_date)
+
+    if flight_data.price < destination['lowestPrice']:
+        notification.send_sms(message=
+                              f"Flight Alert! Pay R{flight_data.price} to "
+                              f"fly from {flight_data.departure_city}-{flight_data.departure_airport}"
+                              f"to{flight_data.destination_city}-{flight_data.destination_airport} "
+                              f"from {flight_data.out_date} to {flight_data.return_date}"
+                              )
+
 
 
 
