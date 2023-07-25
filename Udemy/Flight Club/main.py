@@ -1,7 +1,7 @@
 from email_validator import validate_email, EmailNotValidError
-import re
+from sheety import DataManager
 
-
+my_sheet = DataManager()
 print("Welcome to Flight Club!")
 print("We find the best flight prices for you")
 first_name = input("Please add your first name: ")
@@ -16,13 +16,10 @@ except EmailNotValidError as e:
 email_check = input("Please type your email again: ")
 
 
-def match_email(email1, email2):
-    if email1 == email2:
-        print("email matches")
-    else:
-        print("email does not match")
-
-
-print(match_email(email1=email, email2=email_check))
+if email == email_check:
+    print("You've joined the club")
+    my_sheet.add_user(first=first_name, last=last_name, email=email)
+else:
+    print("email does not match")
 
 
