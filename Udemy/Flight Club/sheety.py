@@ -8,13 +8,26 @@ USER_NAME = os.getenv("USER_NAME")
 USER_PASSWORD = os.getenv("USER_PASSWORD")
 
 
-class DataManager:
+class SheetManager:
     # This class is responsible for talking to the Google Sheet.
     def __init__(self):
         self.data = {}
         self.username = USER_NAME
         self.password = USER_PASSWORD
         self.data_endpoint = "https://api.sheety.co/9c07c3a2fc7f67032e447624ddb97123/flightDeals/users"
+
+    def add_user(self, first, last, email):
+        data_to_add = {
+         "user": {
+            "firstName": first,
+            "lastName": last,
+             "email": email
+             }
+        }
+        response = requests.post(url=f"{self.data_endpoint}", auth=(self.username, self.password),
+                             json=data_to_add)
+        response.raise_for_status()
+        print(response.text)
 
     # def update_destination_codes(self):
     #     for city in self.data:
@@ -23,19 +36,6 @@ class DataManager:
     #                 "iataCode": city["iataCode"]
     #             }
     #         }
-    #         response = requests.put(url=f"{self.data_endpoint}/{city['id']}", auth=(self.username, self.password),
+    #     response = requests.put(url=f"{self.data_endpoint}/{city['id']}", auth=(self.username, self.password),
     #                                 json=data_to_add)
-    #         print(response.text)
-
-    def add_user(self, first, last, email):
-        data_to_add = {
-            "user": {
-                "firstName": first,
-                "lastName": last,
-                "email": email
-            }
-        }
-        response = requests.post(url=f"{self.data_endpoint}", auth=(self.username, self.password),
-                                 json=data_to_add)
-        print(response.text)
-
+    #     print(response.text)
