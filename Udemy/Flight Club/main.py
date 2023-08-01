@@ -26,7 +26,13 @@ for destination in sheet_data:
         from_time=tomorrow,
         to_time=six_month_from_today
     )
+    # if the flight has an object type of None.
+    if flight is None:
+        continue
+
     if flight.price < destination["lowestPrice"]:
         notification_manager.send_sms(
-            message=f"Low price alert! Only £{flight.price} to fly from {flight.origin_city}-{flight.origin_airport} to {flight.destination_city}-{flight.destination_airport}, from {flight.out_date} to {flight.return_date}."
+            message=f"Low price alert! Only £{flight.price} to fly from {flight.origin_city}-{flight.origin_airport} "
+                    f"to {flight.destination_city}-{flight.destination_airport}, "
+                    f"from {flight.out_date} to {flight.return_date}."
         )
