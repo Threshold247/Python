@@ -42,9 +42,9 @@ class Database:
         cursor.close()
 
 # adding data to the database
-    def adding_data(self):
+    def adding_data(self, task_description, date, reminder):
         sql = '''INSERT INTO Tasks (description, "day", reminder) VALUES (%s, %s, %s)'''
-        vals = ('Input from text box', '2023/07/10', 'false')
+        vals = (task_description, date, reminder)
 
         connection = psycopg2.connect(**self.params)
         cursor = connection.cursor()
