@@ -12,17 +12,20 @@ form_url = "http://secure-retreat-92358.herokuapp.com/"
 
 driver.get(url=form_url)
 
-first_name = driver.find_element(By.NAME, value="fName")
-first_name.send_keys("John")
-first_name.send_keys(Keys.ENTER)
+# Enter text in the First Name text box and submit
+first_name = driver.find_element(By.NAME, value="fName")  # find the element
+first_name.send_keys("John")  # enter the text in box
+first_name.send_keys(Keys.ENTER)  # submit the text
 
-last_name = driver.find_element(By.NAME, value="lName")
-last_name.send_keys("Doe")
-last_name.send_keys(Keys.ENTER)
+# Enter text in the Last Name text box and submit
+last_name = driver.find_element(By.NAME, value="lName")  # find the element
+last_name.send_keys("Doe")  # enter the text in box
+last_name.send_keys(Keys.ENTER)  # submit the text
 
-email = driver.find_element(By.NAME, value="email")
-email.send_keys("john.doe@gmail.com")
-email.send_keys(Keys.ENTER)
+# Enter text in the email address text box and submit using a chaining method
+driver.find_element(By.NAME, value="email").send_keys("john.doe@gmail.com", Keys.ENTER)
 
-submit_btn = driver.find_element(By.CLASS_NAME, value="btn btn-lg btn-primary btn-block")
-submit_btn.click()
+# click on the submit button
+driver.find_element(By.CSS_SELECTOR, value=".btn").click()
+
+driver.quit()
