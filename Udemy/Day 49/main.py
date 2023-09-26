@@ -1,6 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 import time
 from dotenv import load_dotenv
 import os
@@ -13,7 +12,8 @@ driver = webdriver.Firefox(
 )
 
 linkedIn_url = ("https://www.linkedin.com/jobs/search/?currentJobId=3725795875&f_AL=true&f_WT=2&geoId=104035573"
-       "&keywords=python%20engineer&location=South%20Africa&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE&refresh=true")
+                "&keywords=python%20engineer&location=South%20Africa&origin=JOB_SEARCH_PAGE_LOCATION_AUTOCOMPLETE"
+                "&refresh=true")
 
 driver.get(url=linkedIn_url)
 
@@ -21,12 +21,12 @@ driver.get(url=linkedIn_url)
 
 # find sign in button element
 sign_in = driver.find_element(By.XPATH, "/html/body/div[4]/a[1]")
-# wait 3 secs for the sign in button to appear
+# wait 3 secs for the sign-in button to appear
 time.sleep(3)
-# click on the sign in button
+# click on the sign-in button
 sign_in.click()
 
-# fill out the sign in prompt
+# fill out the sign-in prompt
 # waits for the prompt to appear
 time.sleep(3)
 # find the email element
@@ -37,11 +37,31 @@ email.send_keys(os.getenv("EMAIL"))
 password = driver.find_element(By.ID, "password")
 # fill out the password element
 password.send_keys(os.getenv("PASSWORD"))
-# find the sign in button
+# find the sign-in button
 sign_in_btn = driver.find_element(By.XPATH, "/html/body/div/main/div[2]/div[1]/form/div[3]/button")
 # click on the button to login
 sign_in_btn.click()
 print("Sign in success!")
 
 # STEP 3 Find the first job and apply by adding a telephone number
-
+# wait  5 secs for prompt to appear
+time.sleep(5)
+# find the first job on the list
+first_job_ele = driver.find_element(By.XPATH, "/html/body/div[5]/div[3]/div[4]/div/div/main/div/div[1]/div/ul/"
+                                              "li[1]/div")
+# select the the element
+first_job_ele.click()
+# wait 3 seconds for the job to appear
+time.sleep(3)
+# find easy apply button element
+easy_apply_btn = driver.find_element(By.CLASS_NAME, "jobs-apply-button--top-card")
+# click on the easy apply button
+easy_apply_btn.click()
+# wait 3 seconds
+time.sleep(3)
+# find the mobile number text input box
+mobile_number = driver.find_element(By.XPATH, value="//*[@id='single-line-text-form-component-formElement-urn-li-"
+                                                    "jobs-applyformcommon-easyApplyFormElement-3709349912-97385010"
+                                                    "-phoneNumber-nationalNumber']")
+# enter a number in the
+mobile_number.send_keys("0219000000")
