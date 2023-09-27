@@ -22,13 +22,13 @@ driver.get(url=linkedIn_url)
 # find sign in button element
 sign_in = driver.find_element(By.XPATH, "/html/body/div[4]/a[1]")
 # wait 3 secs for the sign-in button to appear
-time.sleep(3)
+time.sleep(5)
 # click on the sign-in button
 sign_in.click()
 
 # fill out the sign-in prompt
 # waits for the prompt to appear
-time.sleep(3)
+time.sleep(5)
 # find the email element
 email = driver.find_element(By.ID, "username")
 # fill out the email element
@@ -54,14 +54,34 @@ first_job_ele.click()
 # wait 3 seconds for the job to appear
 time.sleep(3)
 # find easy apply button element
-easy_apply_btn = driver.find_element(By.CLASS_NAME, "jobs-apply-button--top-card")
+easy_apply_btn = driver.find_element(By.CLASS_NAME, value= "jobs-apply-button--top-card")
 # click on the easy apply button
 easy_apply_btn.click()
+# wait 5 seconds
+time.sleep(5)
+# find the mobile number text input box
+mobile_number = driver.find_element(By.CLASS_NAME, value="artdeco-text-input--input")
+# enter a number in the mobile text field
+mobile_number.send_keys("0219000000")
+
+# find the Apply button element
+next_btn = driver.find_element(By.XPATH, value="/html/body/div[3]/div/div/div[2]/div/div[2]/form/footer/div[2]"
+                                                    "/button/span")
+# click on the Bext button
+next_btn.click()
+# wait 5 seconds
+time.sleep(5)
+# click on the Next button again
+next_btn.click()
+
+# find the Cancel button element
+cancel_button = driver.find_element(By.XPATH,"/html/body/div[3]/div/div/button/li-icon")
+# click the Cancel button
+cancel_button.click()
 # wait 3 seconds
 time.sleep(3)
-# find the mobile number text input box
-mobile_number = driver.find_element(By.XPATH, value="//*[@id='single-line-text-form-component-formElement-urn-li-"
-                                                    "jobs-applyformcommon-easyApplyFormElement-3709349912-97385010"
-                                                    "-phoneNumber-nationalNumber']")
-# enter a number in the
-mobile_number.send_keys("0219000000")
+
+# find the Discard button element
+discard_btn = driver.find_element(By.XPATH, value="/html/body/div[3]/div[2]/div/div[3]/button[1]")
+# click on the Discard button
+discard_btn.click()
