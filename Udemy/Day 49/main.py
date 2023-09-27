@@ -1,8 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-import time
 from dotenv import load_dotenv
 import os
+import time
 
 load_dotenv(".env")
 
@@ -49,12 +49,12 @@ time.sleep(5)
 # find the first job on the list
 first_job_ele = driver.find_element(By.XPATH, "/html/body/div[5]/div[3]/div[4]/div/div/main/div/div[1]/div/ul/"
                                               "li[1]/div")
-# select the the element
+# select the element
 first_job_ele.click()
 # wait 3 seconds for the job to appear
 time.sleep(3)
 # find easy apply button element
-easy_apply_btn = driver.find_element(By.CLASS_NAME, value= "jobs-apply-button--top-card")
+easy_apply_btn = driver.find_element(By.CLASS_NAME, value="jobs-apply-button--top-card")
 # click on the easy apply button
 easy_apply_btn.click()
 # wait 5 seconds
@@ -66,7 +66,7 @@ mobile_number.send_keys("0219000000")
 
 # find the Apply button element
 next_btn = driver.find_element(By.XPATH, value="/html/body/div[3]/div/div/div[2]/div/div[2]/form/footer/div[2]"
-                                                    "/button/span")
+                                               "/button/span")
 # click on the Bext button
 next_btn.click()
 # wait 5 seconds
@@ -75,7 +75,7 @@ time.sleep(5)
 next_btn.click()
 
 # find the Cancel button element
-cancel_button = driver.find_element(By.XPATH,"/html/body/div[3]/div/div/button/li-icon")
+cancel_button = driver.find_element(By.XPATH, "/html/body/div[3]/div/div/button/li-icon")
 # click the Cancel button
 cancel_button.click()
 # wait 3 seconds
