@@ -1,7 +1,6 @@
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import os
-import pprint
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 import requests
@@ -62,7 +61,7 @@ for track in my_list:
     except IndexError:
         print(f"{track} not found on Spotify ")
 
-# print(song_uri)
+print(song_uri)
 
 # Create a spotify playlist
 USER_ID = os.getenv("USER_ID")
@@ -73,6 +72,3 @@ playlist = sp.user_playlist_create(user=USER_ID, name=f"{user_input} Billboard 1
 playlist_id = playlist["uri"]
 # add tracks to the playlist
 add_songs_to_playlist = sp.playlist_add_items(playlist_id=playlist_id, items=song_uri, position=None)
-
-
-

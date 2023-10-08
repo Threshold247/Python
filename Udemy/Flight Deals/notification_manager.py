@@ -9,9 +9,11 @@ TWILIO_AUTH_TOKEN = os.getenv("TWILIO_TOKEN")
 
 
 class NotificationManager:
+    # setup credentials
     def __init__(self):
         self.client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
+    # setup function to send sms
     def send_sms(self, message):
         message = self.client.messages.create(
             body=message,
