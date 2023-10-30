@@ -24,14 +24,36 @@ time.sleep(5)
 
 
 try:
-    Google_button = driver.find_element(By.XPATH, value='//*[@id="c615667929"]')
+    Google_button = driver.find_element(By.XPATH, value='/html/body/div[2]/main/div/div/div[1]/div/div/div[2]'
+                                                        '/div[2]/span/div[1]/div')
     Google_button.click()
     time.sleep(5)
 except NoSuchElementException:
     print("Error")
 
+# Switching to different windows
+
+# Main window
+driver.switch_to.window(driver.window_handles[0])
+# prints the title of the Main window
+print("Main window title = " + driver.title)
+
+# Second window
+driver.switch_to.window(driver.window_handles[1])
+# prints the title of the second window
+print("Second window title = " + driver.title)
+time.sleep(3)
+
 try:
     Google_email = driver.find_element(By.ID, value="identifierId")
-    # Google_email.send_keys(f"")
+    Google_email.send_keys(os.getenv("EMAIL"))
 except NoSuchElementException:
     print("Cannot find text box element")
+
+try:
+    next_btn = driver.find_element(By.XPATH, value="/html/body/div[1]/div[1]/div[2]/div/c-wiz/div/div[2]/div/div[2]"
+                                                   "/div/div[1]/div/div/button/span")
+    next_btn.click()
+except NoSuchElementException:
+    print("Cannot find next button element")
+
