@@ -9,6 +9,7 @@ for num in range(0, 10):
 
 random_number = random.choice(number_list)
 
+
 # home route
 @app.route('/')
 def home():

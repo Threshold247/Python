@@ -7,7 +7,7 @@
   {# Wrap href property in an expression delimiter and point to the static folder and filename #}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link href="https://fonts.googleapis.com/css?family=Merriweather|Montserrat|Sacramento" rel="stylesheet">
-  <link rel="icon" href="favicon.ico">
+  <link rel="icon" href="static/favicon.ico">
 </head>
 
 <body>
@@ -18,7 +18,7 @@
       <h1>I'm Angela.</h1>
       <h2>a <span class="pro">pro</span>grammer.</h2>
     </div>
-    <img class="bottom-cloud" src={{"static/images/cloud.png"}} alt="cloud">
+    <img class="bottom-cloud" src="static/images/cloud.png" alt="cloud">
     <img class="mountain" src={{"static/images/mountain.png"}} alt="mountain-img">
   </div>
 
