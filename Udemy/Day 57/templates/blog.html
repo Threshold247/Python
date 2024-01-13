@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Blog</title>
+</head>
+<body>
+    <h1>My blog post</h1>
+<!--    start off a for loop block which loops through the reference list(blog posts) -->
+        {% for ele in list %}
+<!--        adding a condition that if the id of the blog is equal to 2, display the title and subtitle-->
+            {% if ele.id == 2 %}
+            <h3>{{ ele.title }}</h3>
+            <h4>{{ ele.subtitle }}</h4>
+<!--        all other elements will display title only-->
+            {% else %}
+            <h3>{{ ele.title }}</h3>
+<!--        close condition block      -->
+            {% endif %}
+<!--    close the loop block        -->
+        {% endfor %}
+
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My webpage</title>
+    <link rel="stylesheet" href="static/asset/main.css">
+</head>
+<body>
+    <h1>Hello World</h1>
+<!-- Use url_for to point to the method connected to the blog route   -->
+    <h3>View my blog post <a href="{{ url_for('blog_post') }}">here</a></h3>
+</body>
+    <footer>
+        <p>Copyright {{ year }}</p>
+    </footer>
+</html>
