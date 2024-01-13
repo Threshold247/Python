@@ -72,11 +72,16 @@ except NoSuchElementException:
 
 # Send post to Telkom
 time.sleep(15)
-# click on Post button
+# click on Post input
 try:
-    post_btn = driver.find_element(By.XPATH, "/html/body/div[1]/div/div/div[2]/header/div/div/div/div[1]/div[3]/a")
+    post_box = driver.find_element(By.XPATH, "/html/body/div[1]/div/div/div[2]/main/div/div/div/div[1]/div/div[3]"
+                                             "/div/div[2]/div[1]/div/div/div/div[2]/div[1]/div/div/div/div/div/div/div"
+                                             "/div/div/div/label/div[1]/div/div/div/div/div/div[2]/div/div/div/div")
 
-    print("clicked on Post button")
+    print("clicked on Post input box")
+    time.sleep(15)
+    post_box.click()
+    post_box.send_keys("Test post")
 except NoSuchElementException:
     print("Search pot button not found")
 
