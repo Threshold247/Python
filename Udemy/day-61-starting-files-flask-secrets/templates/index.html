@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Secrets</title>
-  </head>
-  <body>
+<!--extend head html from base.html-->
+{% extends "base.html" %}
+<!--This block inserts a custom title into the header of the template.-->
+{% block title %}Welcome Page{% endblock %}
+<!--#3. This block provides the content of the website. The part that is going to vary between webpages.-->
+{% block content %}
     <div class="jumbotron">
       <div class="container">
         <h1>Welcome</h1>
@@ -17,5 +17,4 @@
         </form>
       </div>
     </div>
-  </body>
-</html>
+{% endblock %}

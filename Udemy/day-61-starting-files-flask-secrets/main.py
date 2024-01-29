@@ -1,7 +1,8 @@
-from flask import Flask, render_template,request
+from flask import Flask, render_template
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
+from flask_bootstrap import Bootstrap5
 
 '''
 Red underlines? Install the required packages first: 
@@ -18,7 +19,11 @@ This will install the packages from requirements.txt for this project.
 
 
 app = Flask(__name__)
+# create bootstrap class
+bootstrap = Bootstrap5(app)
 app.secret_key = "1234"
+email_login = 'admin@email.com'
+password_login = '12345678'
 
 
 # create class and set attributes
@@ -41,15 +46,25 @@ def login():
     form = MyForm()
     form.validate_on_submit()
     if form.validate_on_submit():
-        print(request.form['email'])
-        print(request.form['password'])
-        return redirect()
+        # instead of using request.form['key name'], use <form_object>.<form_field>.data
+        print(form.email.data)
+        print(form.password.data)
+        # check if both email and password match the required credentials
+        if form.email.data == email_login and form.password.data == password_login:
+            return success()
+        else:
+            return denied()
     return render_template('login.html', form=form)
 
 
 @app.route('/success')
-def redirect():
+def success():
     return render_template('success.html')
+
+
+@app.route('/denied')
+def denied():
+    return render_template('denied.html')
 
 
 if __name__ == '__main__':
