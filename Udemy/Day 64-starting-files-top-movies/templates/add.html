@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+<!--import render form in order to display elements on page-->
+{% from 'bootstrap5/form.html' import render_form %}
+{% block title %}Add Movie{% endblock %}
+
+{% block content %}
+<div class="content">
+    <h1 class="heading">Add a Movie</h1>
+<!--    call render_form method and add class passed from main.py-->
+    {{ render_form(form) }}
+</div>
+{% endblock %}
