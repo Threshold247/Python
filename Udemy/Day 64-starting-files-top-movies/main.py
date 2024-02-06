@@ -5,7 +5,8 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Float
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, URL
+from wtforms.validators import DataRequired
+import requests
 
 '''
 Red underlines? Install the required packages first: 
@@ -19,7 +20,7 @@ pip3 install -r requirements.txt
 
 This will install the packages from requirements.txt for this project.
 '''
-
+movie_database_key = 'c50fd07bcacaa34b086b6d4af846001e'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap5(app)
@@ -68,14 +69,9 @@ class Movie(db.Model):
 #     db.session.commit()
 
 # setup Flask form class with labels and validation
-class MyIndexForm(FlaskForm):
-    title = StringField(label='Title', validators=[DataRequired()])
-    year = StringField(label='Year', validators=[DataRequired()])
-    description = StringField(label='Description', validators=[DataRequired()])
-    rating = StringField(label='Rating', validators=[DataRequired()])
-    ranking = StringField(label='Ranking', validators=[DataRequired()])
-    review = StringField(label='Review', validators=[DataRequired()])
-    img_url = StringField(label='Image URL', validators=[DataRequired(), URL()])
+class MyAddForm(FlaskForm):
+    title = StringField(label='Movie Title', validators=[DataRequired()])
+
     submit_btn = SubmitField(label="Add movie")
 
 
@@ -83,6 +79,10 @@ class MyEditForm(FlaskForm):
     rating = StringField(label="Your rating out of 10 e.g 7.5 ", validators=[DataRequired()])
     review = StringField(label="Your review here", validators=[DataRequired()])
     done_btn = SubmitField(label="Done")
+
+
+class MySelectForm(FlaskForm):
+    pass
 
 
 @app.route("/")
@@ -94,22 +94,35 @@ def home():
 
 @app.route("/add", methods=['GET', 'POST'])
 def add():
-    form = MyIndexForm()
+    form = MyAddForm()
     form.validate_on_submit()
 
     # use this code block to send data to the db.
     if request.method == 'POST':
-        print("It posted")
-        print(f"{form.title.data}")
-        add_movie = Movie(title=form.title.data, year=form.year.data, description=form.description.data,
-                          rating=form.rating.data, ranking=form.ranking.data, review=form.review.data,
-                          img_url=form.img_url.data)
-        db.session.add(add_movie)
-        # commit data to the table
-        db.session.commit()
-        # redirect to home screen after data is committed
-        return redirect(url_for('home'))
+        print(request.method)
+        print(form.title.data)
+        # connect to the movie database api, bring back the information.
+        url = f"https://api.themoviedb.org/3/search/movie?query={form.title.data}&include_adult=false&language=en-US&page=1"
+
+        headers = {
+            "accept": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjNTBmZDA3YmNhY2FhMzRiMDg2YjZkNGFmODQ2MDAxZSIsInN1YiI6IjY1YzFmYmZiYTA2NjQ1MDE2MTVkZmM2MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0FviLyvHRIe36bZbKeMsfOd91y4KR5QViflSTWRaniM"
+        }
+
+        response = requests.get(url, headers=headers)
+        data = response.json()
+        movie_data = data['results'][0]
+        print(movie_data)
+        # add_movie = Movie(title=form.title.data, year=form.year.data, description=form.description.data,
+        #                   rating=form.rating.data, ranking=form.ranking.data, review=form.review.data,
+        #                   img_url=form.img_url.data)
+        # db.session.add(add_movie)
+        # # commit data to the table
+        # db.session.commit()
+        # # redirect to home screen after data is committed
+        return redirect(url_for('select', movies=movie_data))
     return render_template("add.html", form=form)
+
 
 
 @app.route("/edit/<movie_id>", methods=['GET', 'POST'])
@@ -138,10 +151,6 @@ def delete():
     db.session.delete(movie)
     db.session.commit()
     return redirect(url_for('home'))
-
-
-
-
 
 
 @app.route("/select")
