@@ -82,6 +82,7 @@ class MyAddForm(FlaskForm):
 
 class MyEditForm(FlaskForm):
     rating = StringField(label="Your rating out of 10 e.g 7.5 ", validators=[DataRequired()])
+    ranking = StringField(label="Change the ranking", validators=[DataRequired()])
     review = StringField(label="Your review here", validators=[DataRequired()])
     done_btn = SubmitField(label="Done")
 
@@ -127,6 +128,8 @@ def edit(movie_id):
     if request.method == "POST":
         # amend the rating
         movie.rating = float(form.rating.data)
+        # amend the ranking
+        movie.ranking = int(form.ranking.data)
         # amend the review
         movie.review = form.review.data
         # commit the changes
@@ -153,7 +156,7 @@ def select(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?language=en-US"
     headers = {
         "accept": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjNTBmZDA3YmNhY2FhMzRiMDg2YjZkNGFmODQ2MDAxZSIsInN1YiI6IjY1YzFmYmZiYTA2NjQ1MDE2MTVkZmM2MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0FviLyvHRIe36bZbKeMsfOd91y4KR5QViflSTWRaniM"
+        "Authorization": os.getenv("Authorization")
     }
     response = requests.get(url, headers=headers)
     movie = response.json()
