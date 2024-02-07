@@ -7,6 +7,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 import requests
+import os
+from dotenv import load_dotenv
+load_dotenv('.env')
 
 '''
 Red underlines? Install the required packages first: 
@@ -20,10 +23,12 @@ pip3 install -r requirements.txt
 
 This will install the packages from requirements.txt for this project.
 '''
-movie_database_key = 'c50fd07bcacaa34b086b6d4af846001e'
+movie_database_key = os.getenv('movie_database_key')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap5(app)
+
+MOVIE_DB_IMAGE_URL = "https://image.tmdb.org/t/p/w500"
 
 
 # CREATE DB
@@ -99,30 +104,19 @@ def add():
 
     # use this code block to send data to the db.
     if request.method == 'POST':
-        print(request.method)
-        print(form.title.data)
         # connect to the movie database api, bring back the information.
         url = f"https://api.themoviedb.org/3/search/movie?query={form.title.data}&include_adult=false&language=en-US&page=1"
 
         headers = {
             "accept": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjNTBmZDA3YmNhY2FhMzRiMDg2YjZkNGFmODQ2MDAxZSIsInN1YiI6IjY1YzFmYmZiYTA2NjQ1MDE2MTVkZmM2MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0FviLyvHRIe36bZbKeMsfOd91y4KR5QViflSTWRaniM"
+            "Authorization": os.getenv("Authorization")
         }
 
         response = requests.get(url, headers=headers)
-        data = response.json()
-        movie_data = data['results'][0]
-        print(movie_data)
-        # add_movie = Movie(title=form.title.data, year=form.year.data, description=form.description.data,
-        #                   rating=form.rating.data, ranking=form.ranking.data, review=form.review.data,
-        #                   img_url=form.img_url.data)
-        # db.session.add(add_movie)
-        # # commit data to the table
-        # db.session.commit()
-        # # redirect to home screen after data is committed
-        return redirect(url_for('select', movies=movie_data))
-    return render_template("add.html", form=form)
+        data = response.json()['results']
 
+        return render_template('select.html', movies=data)
+    return render_template("add.html", form=form)
 
 
 @app.route("/edit/<movie_id>", methods=['GET', 'POST'])
@@ -153,9 +147,25 @@ def delete():
     return redirect(url_for('home'))
 
 
-@app.route("/select")
-def select():
-    return render_template("select.html")
+@app.route("/select/<movie_id>", methods=['GET', 'POST'])
+def select(movie_id):
+
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}?language=en-US"
+    headers = {
+        "accept": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjNTBmZDA3YmNhY2FhMzRiMDg2YjZkNGFmODQ2MDAxZSIsInN1YiI6IjY1YzFmYmZiYTA2NjQ1MDE2MTVkZmM2MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.0FviLyvHRIe36bZbKeMsfOd91y4KR5QViflSTWRaniM"
+    }
+    response = requests.get(url, headers=headers)
+    movie = response.json()
+    new_movie = Movie(
+        title=movie['original_title'],
+        img_url=f"{MOVIE_DB_IMAGE_URL}{movie['poster_path']}",
+        year=movie['release_date'].split("-")[0],
+        description=movie['overview']
+    )
+    db.session.add(new_movie)
+    db.session.commit()
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':
