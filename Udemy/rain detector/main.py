@@ -9,7 +9,7 @@ my_api = os.getenv("OWA_API_KEY")
 # create variable to store api url
 OWA = "https://api.openweathermap.org/data/2.5/forecast"
 # parameters for the Client
-account_sid = "AC8e378b769f646cdbca7253c818014f1b"
+account_sid = os.getenv("account_sid")
 auth_token = os.getenv("TWILIO_TOKEN")
 # create variable to store longitude
 MY_LONG = 18.4232
