@@ -1,7 +1,9 @@
-from flask import Flask, jsonify, render_template, request,url_for,redirect
+from flask import Flask, jsonify, render_template, request, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Boolean
+
+
 import random
 
 '''
@@ -80,6 +82,19 @@ def all_cafes():
     # return each cafe in the list as a dictionary
     return jsonify(cafes=[to_dict(cafe) for cafe in cafes])
 
+
+@app.route('/search/')
+def search():
+    # get the request param value for loc
+    location = request.args.get('loc')
+    find_cafe = db.session.execute(db.select(Cafe).where(Cafe.location == location))
+    cafes = find_cafe.scalars().all()
+    if cafes:
+        # return cafes matching location
+        return jsonify(cafes=[to_dict(cafe) for cafe in cafes])
+    else:
+        # return error message and status code
+        return jsonify(error={"Not found": "Location not found"}), 404
 
 # HTTP POST - Create Record
 
