@@ -2,10 +2,10 @@ from flask import Flask, jsonify, render_template, request, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Boolean
-
-
+from dotenv import load_dotenv
+import os
 import random
-
+load_dotenv(".env")
 '''
 Install the required packages first: 
 Open the Terminal in PyCharm (bottom left). 
@@ -154,7 +154,7 @@ def delete_cafe(cafe_id):
         api_key = request.args.get('api_key')
         cafe = db.session.execute(db.select(Cafe).where(Cafe.id == cafe_id)).scalar_one()
         # if the data exist update the new price
-        if api_key == 'TopSecretAPIKey':
+        if api_key == os.getenv('api-key'):
             db.session.delete(cafe)
             db.session.commit()
             return jsonify(f"success: {cafe_id} has been deleted"), 200
