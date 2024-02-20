@@ -21,9 +21,12 @@ This will install the packages from requirements.txt for this project.
 
 app = Flask(__name__)
 
+
 # CREATE DB
 class Base(DeclarativeBase):
     pass
+
+
 # Connect to Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cafes.db'
 db = SQLAlchemy(model_class=Base)
@@ -83,7 +86,7 @@ def all_cafes():
     return jsonify(cafes=[to_dict(cafe) for cafe in cafes])
 
 
-@app.route('/search/')
+@app.route('/search')
 def search():
     # get the request param value for loc
     location = request.args.get('loc')
@@ -96,11 +99,69 @@ def search():
         # return error message and status code
         return jsonify(error={"Not found": "Location not found"}), 404
 
+
 # HTTP POST - Create Record
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    # get the value of the key called name if a post request is sent
+    # name = request.values.get('name')
+    try:
+        if request.method == 'POST':
+            add_cafe = Cafe(
+                id=request.form.get('id'),
+                name=request.form.get('name'),
+                map_url=request.form.get('map_url'),
+                img_url=request.form.get('img_url'),
+                location=request.form.get('location'),
+                #  If the field is filled it is True, if empty it is False.
+                has_sockets=bool(request.form.get("sockets")),
+                has_toilet=bool(request.form.get("toilet")),
+                has_wifi=bool(request.form.get("wifi")),
+                can_take_calls=bool(request.form.get("calls")),
+                seats=request.form.get("seats"),
+                coffee_price=request.form.get("coffee_price"),
+            )
+            db.session.add(add_cafe)
+            db.session.commit()
+            return jsonify(response={"success": "Successfully added the cafe"}), 200
+    except Exception as error:
+        return jsonify({"error": {"message": str(error)}}), 500
+
 
 # HTTP PUT/PATCH - Update Record
+@app.route('/update-price/<int:cafe_id>', methods=['GET', 'POST', 'PATCH'])
+def update_price(cafe_id):
+    try:
+        # get value of request param
+        new_price = request.values.get('new_price')
+        # check if cafe exists by checking data for cafe id
+        cafe = db.session.execute(db.select(Cafe).where(Cafe.id == cafe_id)).scalar_one()
+        # if the data exist update the new price
+        if cafe:
+            cafe.coffee_price = new_price
+            db.session.commit()
+            return jsonify(f"success: {cafe_id} updated price to {new_price}"), 200
+        else:
+            return jsonify({"error": {"message": "Cafe id does not exist"}}), 500
+    except Exception:
+        return jsonify({"}error": {"message": "Cafe id does not exist or price was not inserted"}}), 500
+
 
 # HTTP DELETE - Delete Record
+@app.route('/review-closed/<int:cafe_id>', methods=['DELETE'])
+def delete_cafe(cafe_id):
+    try:
+        api_key = request.args.get('api_key')
+        cafe = db.session.execute(db.select(Cafe).where(Cafe.id == cafe_id)).scalar_one()
+        # if the data exist update the new price
+        if api_key == 'TopSecretAPIKey':
+            db.session.delete(cafe)
+            db.session.commit()
+            return jsonify(f"success: {cafe_id} has been deleted"), 200
+        else:
+            return jsonify({"error": {"message": "api-key is incorrect"}}), 403
+    except Exception:
+        return jsonify({"error": {"message": "Cafe id does not exist"}}), 404
 
 
 if __name__ == '__main__':
