@@ -153,7 +153,7 @@ def delete_cafe(cafe_id):
     try:
         api_key = request.args.get('api_key')
         cafe = db.session.execute(db.select(Cafe).where(Cafe.id == cafe_id)).scalar_one()
-        # if the data exist update the new price
+        # if api key matches whats on record, delete the cafe with the matching id.
         if api_key == os.getenv('api-key'):
             db.session.delete(cafe)
             db.session.commit()
