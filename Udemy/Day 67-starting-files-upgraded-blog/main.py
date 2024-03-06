@@ -27,7 +27,7 @@ This will install the packages from the requirements.txt for this project.
 '''
 
 app = Flask(__name__)
-app.config['CKEDITOR_PKG_TYPE'] = 'basic'
+app.config['CKEDITOR_PKG_TYPE'] = 'full'
 ckeditor = CKEditor(app)
 app.config['SECRET_KEY'] = os.getenv('api-key')
 Bootstrap5(app)
@@ -64,12 +64,11 @@ class MyForm(FlaskForm):
     # adding a validators requires a valid input which will prompt user to fill out the input.
     title = StringField(label='Title', validators=[DataRequired()])
     subtitle = StringField(label='Subtitle', validators=[DataRequired()])
-    date = StringField(label='Date', validators=[DataRequired()])
-    # requires CKEditor because of the amount of text required
-    body = CKEditorField(label='Body', validators=[DataRequired()])
     author = StringField(label='Author', validators=[DataRequired()])
     img_url = StringField(label='Image URL', validators=[URL()])
-    submit_btn = SubmitField(label="Submit")
+    # requires CKEditor because of the amount of text required
+    body = CKEditorField(label='Blogpost Body', validators=[DataRequired()])
+    submit_btn = SubmitField(label="Submit blog")
 
 
 @app.route('/')
@@ -87,29 +86,56 @@ def show_post(post_id):
     return render_template("post.html", post=requested_post)
 
 
-# TODO: add_new_post() to create a new blog post
-@app.route('/make_post', methods=['GET', 'POST'])
+# add_new_post() to create a new blog post
+@app.route('/new_post/', methods=['GET', 'POST', 'PATCH'])
 def add_new_post():
     form = MyForm()
-
-    form.validate_on_submit()
-    # try:
-    #     if request.method == 'POST':
-    #         add_post = BlogPost(
-    #             id=request.form.get('id'),
-    #
-    #         )
-    #         db.session.add(add_post)
-    #         db.session.commit()
-    #         return render_template('make-post.html')
-    # except Exception as error:
-    #     return jsonify({"error": {"message": str(error)}}), 500
+    if form.validate_on_submit():
+        try:
+            add_post = BlogPost(
+                    title=request.form.get("title"),
+                    subtitle=request.form.get("subtitle"),
+                    date=date.today().strftime('%B %d,%Y'),
+                    body=request.form.get('body'),
+                    author=request.form.get("author"),
+                    img_url=request.form.get("img_url")
+                )
+            db.session.add(add_post)
+            db.session.commit()
+            return redirect(url_for('get_all_posts'))
+        except Exception as error:
+            return jsonify({"error": {"message": str(error)}}), 500
     return render_template('make-post.html', form=form)
 
 
-# TODO: edit_post() to change an existing blog post
+# edit_post() to change an existing blog post
+@app.route('/edit-post/<int:post_id>')
+def edit_post(post_id):
+    requested_post = db.get_or_404(BlogPost, post_id)
+    edit_form = MyForm(
+        title=requested_post.title,
+        subtitle=requested_post.subtitle,
+        date=requested_post.date,
+        body=requested_post.body,
+        author=requested_post.author,
+        img_url=requested_post.img_url
+    )
+    return render_template('make-post.html', form=edit_form, post_id=post_id)
 
-# TODO: delete_post() to remove a blog post from the database
+
+# delete_post() to remove a blog post from the database
+@app.route('/delete-post/<post_id>', methods=['DELETE'])
+def delete_post(post_id):
+    try:
+        api_key = request.args.get('api-key')
+        blog_to_delete = db.session.execute(db.select(BlogPost).where(BlogPost.id == post_id)).scalar_one()
+        # check if the api key matches the one on record.
+        if api_key == os.getenv('api-key'):
+            db.session.delete(blog_to_delete)
+            db.session.commit()
+    except Exception as error:
+        print(error)
+
 
 # Below is the code from previous lessons. No changes needed.
 @app.route("/about")
