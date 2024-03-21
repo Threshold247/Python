@@ -56,6 +56,12 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == "POST":
+        user_email = request.form.get("email")
+        user = db.session.execute(db.select(User).where(User.email == user_email)).scalar_one()
+        if user:
+            # User already exists
+            flash("Email already exists", category="error")
+            return redirect(url_for('register'))
         # hash and salt user password
         hash_and_salted_password = generate_password_hash(
             request.form.get('password'),
@@ -68,17 +74,14 @@ def register():
             name=request.form.get('name'),
             password=hash_and_salted_password,
         )
-
         db.session.add(new_user)
         db.session.commit()
-
         # Log in and authenticate user after adding details to database.
         login_user(new_user)
 
         # Can redirect() and get name from the current_user
         return redirect(url_for("secrets", name=new_user.name))
-
-    return render_template("register.html")
+    return render_template("register.html", logged_in=current_user.is_authenticated)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -86,25 +89,37 @@ def login():
     if request.method == "POST":
         login_email = request.form.get('email')
         login_password = request.form.get('password')
+        try:
+            # find the user in the dbase and return an object
+            user = db.session.execute(db.select(User).where(User.email == login_email)).scalar_one()
+            if check_password_hash(user.password, login_password):
+                login_user(user)
+                return redirect(url_for('secrets'))
+            else:
+                print("Login unsuccessful")
+                flash("Incorrect password", category="error")
+                return redirect(url_for('login'))
+        except Exception:
+            flash("Email does not exist", category="error")
+            return redirect(url_for('login'))
+    return render_template("login.html", logged_in=current_user.is_authenticated)
 
-        user = db.session.execute()
-    
-    return render_template("login.html")
 
-
-@app.route('/secrets/<name>')
-def secrets(name):
-    return render_template("secrets.html", name=name)
+@app.route('/secrets/')
+@login_required
+def secrets():
+    print(current_user.name)
+    return render_template("secrets.html", name=current_user.name, logged_in=True)
 
 
 @app.route('/logout')
 def logout():
-    pass
-    # logout_user()
-    # return redirect(url_for('home'))
+    logout_user()
+    return redirect(url_for('home'))
 
 
 @app.route('/download')
+@login_required
 def download():
     return send_from_directory('static', path="files/cheat_sheet.pdf")
 
