@@ -1,0 +1,50 @@
+{% extends "base.html" %} {% block content %}
+
+<!--TODO: Display the user's name in the h1 title-->
+
+<div class="box">
+  <h1>Welcome, Name!</h1>
+  <form action="{{ url_for('tasks') }}" method="post" >
+    <input name="description" type="text" placeholder="Task description">
+    <input name="date" type="date" placeholder="Date format MM/DD/YYYY">
+    <label>Set task reminder</label>
+    <label class="checkbox-inline">
+      <input type="checkbox" name="True">
+    </label>
+     <div>
+      <button type="submit" class="btn btn-primary" >Add task</button>
+    </div>
+   </form>
+    <br>
+    <form >
+        <!--Make a GET request to database to show tasks-->
+    <table class="table table-bordered" style="color: white">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Description</th>
+      <th scope="col">Date</th>
+      <th scope="col" colspan="2">Options</th>
+    </tr>
+  </thead>
+
+  <tbody>
+  {% for task in tasks %}
+    <tr>
+      <th scope="row">{{ task.id }}</th>
+      <td>{{ task.description }}</td>
+      <td>{{ task.date }}</td>
+      <td>
+          <a href="{{ url_for('edit_task', task_id=task.id) }}">Edit</a>
+      </td>
+      <td>
+          <a class="btn btn-danger" href="{{ url_for('delete_task', task_id=task.id) }}"> x</a>
+      </td>
+    </tr>
+  </tbody>
+   {% endfor %}
+    </table>
+    </form>
+
+</div>
+{% endblock %}

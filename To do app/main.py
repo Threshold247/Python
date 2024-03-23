@@ -3,6 +3,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, URL
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 import os
 from dotenv import load_dotenv
@@ -52,14 +54,47 @@ def register():
     return render_template('register.html')
 
 
-@app.route('/tasks')
+@app.route('/tasks', methods=['GET', 'POST'])
 def tasks():
     # add SQL here to get data from database
     # text input box for description
     # text input box for date
     # reminder button to highlight task
     # list all tasks on database
-    return render_template('tasks.html')
+    task_list = db.session.execute(db.select(Task)).scalars()
+
+    if request.method == "POST":
+        check_reminder = request.form.get("True")
+        if check_reminder == 'on':
+            check_reminder = True
+        else:
+            check_reminder = False
+        add_task = Task(
+            description=request.form.get("description"),
+            date=request.form.get("date"),
+            reminder=check_reminder
+        )
+        db.session.add(add_task)
+        db.session.commit()
+    return render_template('tasks.html', tasks=task_list)
+
+
+@app.route('/edit_task/<int:task_id>', methods=['GET', 'POST', 'PATCH'])
+def edit_task(task_id):
+    print(task_id)
+    return redirect(url_for('tasks'))
+
+
+@app.route('/delete/<int:task_id>', methods=['GET', 'POST', 'DELETE'])
+def delete_task(task_id):
+    print(task_id)
+    try:
+        task_to_delete = db.session.execute(db.select(Task).where(Task.id == task_id)).scalar_one()
+        db.session.delete(task_to_delete)
+        db.session.commit()
+    except Exception:
+        print("error")
+    return redirect(url_for('tasks'))
 
 
 @app.route('/logout')
