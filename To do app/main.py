@@ -64,7 +64,7 @@ def tasks():
     task_list = db.session.execute(db.select(Task)).scalars()
 
     if request.method == "POST":
-        check_reminder = request.form.get("True")
+        check_reminder = request.form.get("reminder")
         if check_reminder == 'on':
             check_reminder = True
         else:
@@ -81,8 +81,19 @@ def tasks():
 
 @app.route('/edit_task/<int:task_id>', methods=['GET', 'POST', 'PATCH'])
 def edit_task(task_id):
-    print(task_id)
-    return redirect(url_for('tasks'))
+    task_to_edit = db.session.execute(db.select(Task).where(Task.id == task_id)).scalar_one()
+    if request.method == 'POST':
+        task_description = request.form.get("description")
+        task_date = request.form.get("date")
+        task_reminder = request.form.get("reminder")
+        if task_description == "":
+            unedited_description = task_to_edit.description
+            print(unedited_description)
+        else:
+            edit_description = task_description
+            print(edit_description)
+        return redirect(url_for('tasks'))
+    return render_template('edit.html', task=task_to_edit)
 
 
 @app.route('/delete/<int:task_id>', methods=['GET', 'POST', 'DELETE'])

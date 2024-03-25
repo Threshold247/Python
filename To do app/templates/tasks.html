@@ -9,7 +9,7 @@
     <input name="date" type="date" placeholder="Date format MM/DD/YYYY">
     <label>Set task reminder</label>
     <label class="checkbox-inline">
-      <input type="checkbox" name="True">
+      <input type="checkbox" name="reminder">
     </label>
      <div>
       <button type="submit" class="btn btn-primary" >Add task</button>
@@ -27,11 +27,14 @@
       <th scope="col" colspan="2">Options</th>
     </tr>
   </thead>
-
+    {% for task in tasks %}
   <tbody>
-  {% for task in tasks %}
+    {% if task.reminder: %}
+    <tr class="table-success">
+    {% else: %}
     <tr>
-      <th scope="row">{{ task.id }}</th>
+    {% endif %}
+      <th scope="row" >{{ task.id }}</th>
       <td>{{ task.description }}</td>
       <td>{{ task.date }}</td>
       <td>
