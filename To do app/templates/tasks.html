@@ -27,8 +27,9 @@
       <th scope="col" colspan="2">Options</th>
     </tr>
   </thead>
-    {% for task in tasks %}
+
   <tbody>
+    {% for task in tasks %}
     {% if task.reminder: %}
     <tr class="table-success">
     {% else: %}
@@ -44,8 +45,9 @@
           <a class="btn btn-danger" href="{{ url_for('delete_task', task_id=task.id) }}"> x</a>
       </td>
     </tr>
+     {% endfor %}
   </tbody>
-   {% endfor %}
+
     </table>
     </form>
 

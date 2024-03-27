@@ -92,6 +92,9 @@ def edit_task(task_id):
         else:
             edit_description = task_description
             print(edit_description)
+
+
+
         return redirect(url_for('tasks'))
     return render_template('edit.html', task=task_to_edit)
 
