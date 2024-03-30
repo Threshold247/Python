@@ -6,7 +6,7 @@
   <h1>Edit your task here</h1>
   <form action="{{ url_for('edit_task', task_id = task.id) }}" method="post" >
     <input name="description" type="text" placeholder="{{ task.description }}">
-    <input type="text" placeholder="Current date: {{ task.date }}">
+    <input name ="date" type="text" placeholder="Current date: {{ task.date }}">
     <label>Set task reminder</label>
     <label class="checkbox-inline">
       {% if task.reminder: %}

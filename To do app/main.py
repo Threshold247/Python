@@ -81,20 +81,32 @@ def tasks():
 
 @app.route('/edit_task/<int:task_id>', methods=['GET', 'POST', 'PATCH'])
 def edit_task(task_id):
+    # return specific task linked to task_id
     task_to_edit = db.session.execute(db.select(Task).where(Task.id == task_id)).scalar_one()
+    edit_task_field = request.form.get("description")
+    edit_task_date = request.form.get("date")
+    edit_task_reminder = request.form.get("reminder")
     if request.method == 'POST':
-        task_description = request.form.get("description")
-        task_date = request.form.get("date")
-        task_reminder = request.form.get("reminder")
-        if task_description == "":
-            unedited_description = task_to_edit.description
-            print(unedited_description)
+        # if the field remains unedited use the original text
+        if edit_task_field == "":
+            task_to_edit.description = task_to_edit.description
+        # otherwise use the new updated text
         else:
-            edit_description = task_description
-            print(edit_description)
+            task_to_edit.description = request.form.get("description")
+        # if the field remains unedited use the original text
+        if edit_task_date == "":
+            task_to_edit.date = task_to_edit.date
+        # otherwise use the new updated text
+        else:
+            task_to_edit.date = request.form.get("date")
+        # if the reminder is marked to return True for the dbase requirement
+        if edit_task_reminder == "on":
+            task_to_edit.reminder = True
+        # otherwise the reminder is marked to return False for the dbase requirement
+        else:
+            task_to_edit.reminder = False
 
-
-
+        db.session.commit()
         return redirect(url_for('tasks'))
     return render_template('edit.html', task=task_to_edit)
 

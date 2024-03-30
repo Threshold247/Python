@@ -5,8 +5,8 @@
 <div class="box">
   <h1>Welcome, Name!</h1>
   <form action="{{ url_for('tasks') }}" method="post" >
-    <input name="description" type="text" placeholder="Task description">
-    <input name="date" type="date" placeholder="Date format MM/DD/YYYY">
+    <input name="description" type="text" placeholder="Task description" required>
+    <input name="date" type="date" placeholder="Date format MM/DD/YYYY" required>
     <label>Set task reminder</label>
     <label class="checkbox-inline">
       <input type="checkbox" name="reminder">
