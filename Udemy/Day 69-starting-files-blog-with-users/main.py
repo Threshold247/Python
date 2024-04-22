@@ -3,14 +3,14 @@ from flask import Flask, abort, render_template, redirect, url_for, flash,reques
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_gravatar import Gravatar
-from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
+from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Text
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
-from forms import CreatePostForm, RegisterUserForm, LoginUser
+from forms import CreatePostForm, RegisterUserForm, LoginUser, CommentForm
 
 
 '''
@@ -31,19 +31,29 @@ app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 ckeditor = CKEditor(app)
 Bootstrap5(app)
 
-# TODO: Configure Flask-Login
+
+# Configure Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# Create a user_loader callback. Connects to the User table
+@login_manager.user_loader
+def load_user(user_id):
+    return db.get_or_404(User, user_id)
 
 
 # CREATE DATABASE
 class Base(DeclarativeBase):
     pass
+
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
 
 # CONFIGURE TABLES
-class BlogPost(db.Model):
+class BlogPost(UserMixin, db.Model):
     __tablename__ = "blog_posts"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
@@ -55,7 +65,7 @@ class BlogPost(db.Model):
 
 
 # Create a User table for all your registered users.
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "registered_user"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(100), unique=True)
@@ -73,23 +83,27 @@ def register():
     form = RegisterUserForm()
     if request.method == 'POST':
         email = request.form.get('email')
+        user = db.session.execute(db.select(User).where(User.email == email)).scalar_one()
+        if user:
+            # User already exists
+            flash(message="Email already exits", category="error")
+            return redirect(url_for('register'))
+        # hash and salt user password
         password = generate_password_hash(request.form.get('password'),
                                           method='pbkdf2:sha256',
                                           salt_length=8)
         name = request.form.get('name')
-        print(email)
-        print(password)
-        print(name)
         new_user = User(
             email=email,
             password=password,
             name=name
         )
-        print(new_user)
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for('get_all_posts'))
-    return render_template("register.html", form=form)
+        # Log in and authenticate user after adding details to database.
+        login_user(new_user)
+        return redirect(url_for('get_all_posts', logged_in=True))
+    return render_template("register.html", form=form,  logged_in=current_user.is_authenticated)
 
 
 # Retrieve a user from the database based on their email.
@@ -103,11 +117,13 @@ def login():
         # get email from User table
         user = db.session.execute(db.select(User).where(User.email == email)).scalar_one()
         # get password and check if the hash value corresponds
-        if check_password_hash(user.password, password):
-            print("True")
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('get_all_posts', logged_in=current_user.is_authenticated))
+        else:
+            flash(message="Password Incorrect", category="error")
 
-        return redirect(url_for('get_all_posts'))
-    return render_template("login.html", form=form)
+    return render_template("login.html", form=form, logged_in=current_user.is_authenticated)
 
 
 @app.route('/logout')
@@ -123,10 +139,13 @@ def get_all_posts():
 
 
 # TODO: Allow logged-in users to comment on posts
+
 @app.route("/post/<int:post_id>")
+@login_required
 def show_post(post_id):
+    form = CommentForm()
     requested_post = db.get_or_404(BlogPost, post_id)
-    return render_template("post.html", post=requested_post)
+    return render_template("post.html", post=requested_post, form=form)
 
 
 # TODO: Use a decorator so only an admin user can create a new post
