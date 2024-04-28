@@ -82,7 +82,7 @@ class BlogPost(db.Model):
     # Create reference to the User object. The "posts" refers to the posts property in the User class.
     author = relationship("User", back_populates="posts")
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
-    comments = relationship("Comment", back_populates="")
+    comments = relationship("Comment", back_populates="parent_post")
 
 # Create a Comment table for comments left by logged-in users.
 class Comment(db.Model):
@@ -121,9 +121,7 @@ def register():
     form = RegisterUserForm()
     if form.validate_on_submit():
         email = request.form.get('email')
-        print(email)
         user = db.session.execute(db.select(User).where(User.email == email)).scalar()
-        print(user)
         if user:
             # User already exists
             flash(message="Email already exits", category="error")
@@ -185,14 +183,27 @@ def get_all_posts():
 
 # TODO: Allow logged-in users to comment on posts
 
-@app.route("/post/<int:post_id>")
+@app.route("/post/<int:post_id>", methods=["GET", "POST"])
 def show_post(post_id):
     form = CommentForm()
     requested_post = db.get_or_404(BlogPost, post_id)
-    return render_template("post.html", post=requested_post, form=form,current_user=current_user)
+    comments = db.session.execute(db.select(Comment)).scalars()
+    if request.method == "POST":
+        # adds comment from logged in user
+        new_comment = Comment(
+            text = request.form.get('comment'),
+            post_id = post_id,
+            author_id = requested_post.author_id
+        )
+        db.session.add(new_comment)
+        db.session.commit()
+        return redirect(url_for('show_post'))
+
+    return render_template("post.html", post=requested_post, form=form,current_user=current_user,
+                           comments=comments)
 
 
-# TODO: Use a decorator so only an admin user can create a new post
+# Use a decorator so only an admin user can create a new post
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
 def add_new_post():
@@ -212,7 +223,7 @@ def add_new_post():
     return render_template("make-post.html", form=form, current_user=current_user)
 
 
-# TODO: Use a decorator so only an admin user can edit a post
+# Use a decorator so only an admin user can edit a post
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
 def edit_post(post_id):
     post = db.get_or_404(BlogPost, post_id)
@@ -236,6 +247,7 @@ def edit_post(post_id):
 
 # TODO: Use a decorator so only an admin user can delete a post
 @app.route("/delete/<int:post_id>")
+@admin_only
 def delete_post(post_id):
     post_to_delete = db.get_or_404(BlogPost, post_id)
     db.session.delete(post_to_delete)
