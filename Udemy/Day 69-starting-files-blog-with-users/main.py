@@ -111,6 +111,16 @@ def admin_only(func):
         return func(*args, **kwargs)
     return decorated_function
 
+#initialise Flask-Gravatar
+gravatar = Gravatar(app,
+                    size=100,
+                    rating='g',
+                    default='retro',
+                    force_default=False,
+                    force_lower=False,
+                    use_ssl=False,
+                    base_url=None)
+
 # Use Werkzeug to hash the user's password when creating a new user.
 # Everytime you call render_template(), you pass the current_user over to the template.
 # This will mean the nav bar will always show the correct options.
@@ -187,20 +197,19 @@ def get_all_posts():
 def show_post(post_id):
     form = CommentForm()
     requested_post = db.get_or_404(BlogPost, post_id)
-    comments = db.session.execute(db.select(Comment)).scalars()
-    if request.method == "POST":
+    if form.validate_on_submit():
+        if not current_user.is_authenticated:
+            flash(message="Please register and login")
+            return redirect(url_for("register"))
         # adds comment from logged in user
         new_comment = Comment(
             text = request.form.get('comment'),
-            post_id = post_id,
-            author_id = requested_post.author_id
+            comment_author=current_user,
+            parent_post=requested_post
         )
         db.session.add(new_comment)
         db.session.commit()
-        return redirect(url_for('show_post'))
-
-    return render_template("post.html", post=requested_post, form=form,current_user=current_user,
-                           comments=comments)
+    return render_template("post.html", post=requested_post, form=form,current_user=current_user)
 
 
 # Use a decorator so only an admin user can create a new post
