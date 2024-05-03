@@ -41,6 +41,8 @@ Bootstrap5(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+current_year = date.today().strftime("%Y")
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -156,7 +158,7 @@ def register():
         # This line will authenticate the user with Flask-Login
         login_user(new_user)
         return redirect(url_for("get_all_posts"))
-    return render_template("register.html", form=form, current_user=current_user)
+    return render_template("register.html", form=form, current_user=current_user, year=current_year)
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -179,7 +181,7 @@ def login():
             login_user(user)
             return redirect(url_for('get_all_posts'))
 
-    return render_template("login.html", form=form, current_user=current_user)
+    return render_template("login.html", form=form, current_user=current_user, year=current_year)
 
 
 @app.route('/logout')
@@ -192,7 +194,7 @@ def logout():
 def get_all_posts():
     result = db.session.execute(db.select(BlogPost))
     posts = result.scalars().all()
-    return render_template("index.html", all_posts=posts, current_user=current_user)
+    return render_template("index.html", all_posts=posts, current_user=current_user, year=current_year)
 
 
 # Add a POST method to be able to post comments
@@ -234,7 +236,7 @@ def add_new_post():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
-    return render_template("make-post.html", form=form, current_user=current_user)
+    return render_template("make-post.html", form=form, current_user=current_user, year=current_year)
 
 
 # Use a decorator so only an admin user can edit a post
@@ -256,7 +258,7 @@ def edit_post(post_id):
         post.body = edit_form.body.data
         db.session.commit()
         return redirect(url_for("show_post", post_id=post.id))
-    return render_template("make-post.html", form=edit_form, is_edit=True, current_user=current_user)
+    return render_template("make-post.html", form=edit_form, is_edit=True, current_user=current_user, year=current_year)
 
 
 # Use a decorator so only an admin user can delete a post
@@ -271,12 +273,12 @@ def delete_post(post_id):
 
 @app.route("/about")
 def about():
-    return render_template("about.html", current_user=current_user)
+    return render_template("about.html", current_user=current_user, year=current_year)
 
 
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
-    return render_template("contact.html", current_user=current_user)
+    return render_template("contact.html", current_user=current_user, year=current_year)
 
 # Optional: You can include the email sending code from Day 60:
 # DON'T put your email and password here directly! The code will be visible when you upload to Github.
