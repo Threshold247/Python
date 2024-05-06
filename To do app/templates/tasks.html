@@ -1,19 +1,22 @@
-{% extends "base.html" %} {% block content %}
+{% from "bootstrap5/form.html" import render_form %}
+{% extends "base.html" %}
+{% block content %}
 
 <!--TODO: Display the user's name in the h1 title-->
 
 <div class="box">
   <h1>Welcome, Name!</h1>
   <form action="{{ url_for('tasks') }}" method="post" >
-    <input name="description" type="text" placeholder="Task description" required>
-    <input name="date" type="date" placeholder="Date format MM/DD/YYYY" required>
-    <label>Set task reminder</label>
-    <label class="checkbox-inline">
-      <input type="checkbox" name="reminder">
-    </label>
-     <div>
-      <button type="submit" class="btn btn-primary" >Add task</button>
-    </div>
+<!--    <input name="description" type="text" placeholder="Task description" required>-->
+<!--    <input name="date" type="date" placeholder="Date format MM/DD/YYYY" required>-->
+<!--    <label>Set task reminder</label>-->
+<!--    <label class="checkbox-inline">-->
+<!--      <input type="checkbox" name="reminder">-->
+<!--    </label>-->
+<!--     <div>-->
+<!--      <button type="submit" class="btn btn-primary" >Add task</button>-->
+<!--    </div>-->
+        {{ render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
    </form>
     <br>
     <form >

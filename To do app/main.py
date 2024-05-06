@@ -1,25 +1,25 @@
-from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
+from flask import Flask, render_template, request, url_for, redirect, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, URL
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+from forms import TaskForm
 import os
 from dotenv import load_dotenv
 
 load_dotenv(".env")
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret-key-goes-here'
-
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+Bootstrap5(app)
 
 class Base(DeclarativeBase):
     pass
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URI','sqlite:///tasks.db')
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
@@ -28,11 +28,17 @@ db.init_app(app)
 # New addition is the UserMixin
 class Task(db.Model):
     __tablename__ = "tasks"
-
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     description: Mapped[str] = mapped_column(String(100))
     date: Mapped[str] = mapped_column(String(100))
     reminder: Mapped[bool] = mapped_column()
+
+class User(UserMixin, db.Model):
+    __tablename__ = "user"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    email: Mapped[str] = mapped_column(String(100), unique=True)
+    password: Mapped[str] = mapped_column(String(100))
+    name: Mapped[str] = mapped_column(String(100))
 
 
 with app.app_context():
@@ -46,6 +52,7 @@ def home():
 
 @app.route('/login')
 def login():
+
     return render_template("login.html")
 
 
@@ -61,22 +68,32 @@ def tasks():
     # text input box for date
     # reminder button to highlight task
     # list all tasks on database
+    form = TaskForm()
     task_list = db.session.execute(db.select(Task)).scalars()
 
     if request.method == "POST":
-        check_reminder = request.form.get("reminder")
-        if check_reminder == 'on':
+        #check_reminder = request.form.get("reminder")
+        check_reminder = form.reminder.data
+        print(f"check_reminder: {check_reminder}")
+        if check_reminder:
             check_reminder = True
         else:
             check_reminder = False
+        # add_task = Task(
+        #     description=request.form.get("description"),
+        #     date=request.form.get("date"),
+        #     reminder=check_reminder
+        # )
+
         add_task = Task(
-            description=request.form.get("description"),
-            date=request.form.get("date"),
-            reminder=check_reminder
+            description = form.description.data,
+            date = form.task_date.data,
+            reminder = check_reminder
         )
         db.session.add(add_task)
         db.session.commit()
-    return render_template('tasks.html', tasks=task_list)
+        return redirect(url_for("tasks"))
+    return render_template('tasks.html', tasks=task_list, form=form)
 
 
 @app.route('/edit_task/<int:task_id>', methods=['GET', 'POST', 'PATCH'])
