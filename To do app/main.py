@@ -1,19 +1,33 @@
-from flask import Flask, render_template, request, url_for, redirect, flash
+import time
+
+from flask import Flask, render_template, request, url_for, redirect, flash,abort
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from forms import TaskForm
+from forms import TaskForm, RegisterUserForm, LoginForm
+from functools import wraps
 import os
 from dotenv import load_dotenv
 
 load_dotenv(".env")
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 Bootstrap5(app)
+
+# Configure Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# Create a user_loader callback. Connects to the User table
+@login_manager.user_loader
+def load_user(user_id):
+    return db.get_or_404(User, user_id)
+
 
 class Base(DeclarativeBase):
     pass
@@ -44,24 +58,65 @@ class User(UserMixin, db.Model):
 with app.app_context():
     db.create_all()
 
+# Create user only decorator
+def user_only(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # if the user is registered
+        if not current_user.is_authenticated:
+            return abort(403)
+        #Otherwise continue with the route function
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route('/')
 def home():
     return render_template("index.html")
 
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        try:
+            user = db.session.execute(db.select(User).where(User.email == form.email.data)).scalar_one()
+        except Exception:
+            flash("Email does not exist")
+            return redirect("login")
+        # get password and check if the hash value corresponds
+        if user and check_password_hash(user.password, form.password.data):
+            login_user(user)
+            return redirect(url_for('tasks'))
+        else:
+            flash(message="Password Incorrect ", category="error")
+    return render_template("login.html", form=form, current_user=current_user)
 
-    return render_template("login.html")
 
-
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('register.html')
+    form = RegisterUserForm()
+    if form.validate_on_submit():
+        user = db.session.execute(db.select(User).where(User.email==form.email.data)).scalar()
+        if user:
+            print("Email exits")
+            return redirect(url_for("login"))
+        new_password = generate_password_hash(form.password.data,method="pbkdf2:sha256", salt_length=8)
+        new_email = form.email.data
+        new_name = form.name.data
+        new_user = User(
+            email = new_email,
+            password = new_password,
+            name = new_name)
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user)
+        return redirect(url_for("tasks"))
+    return render_template('register.html', form=form, current_user=current_user)
 
 
 @app.route('/tasks', methods=['GET', 'POST'])
+@user_only
 def tasks():
     # add SQL here to get data from database
     # text input box for description
@@ -71,7 +126,7 @@ def tasks():
     form = TaskForm()
     task_list = db.session.execute(db.select(Task)).scalars()
 
-    if request.method == "POST":
+    if form.validate_on_submit():
         #check_reminder = request.form.get("reminder")
         check_reminder = form.reminder.data
         print(f"check_reminder: {check_reminder}")
@@ -93,10 +148,11 @@ def tasks():
         db.session.add(add_task)
         db.session.commit()
         return redirect(url_for("tasks"))
-    return render_template('tasks.html', tasks=task_list, form=form)
+    return render_template('tasks.html', tasks=task_list, form=form, current_user=current_user)
 
 
 @app.route('/edit_task/<int:task_id>', methods=['GET', 'POST', 'PATCH'])
+@user_only
 def edit_task(task_id):
     # return specific task linked to task_id
     task_to_edit = db.session.execute(db.select(Task).where(Task.id == task_id)).scalar_one()
@@ -117,7 +173,7 @@ def edit_task(task_id):
         else:
             task_to_edit.date = request.form.get("date")
         # if the reminder is marked to return True for the dbase requirement
-        if edit_task_reminder == "on":
+        if edit_task_reminder:
             task_to_edit.reminder = True
         # otherwise the reminder is marked to return False for the dbase requirement
         else:
@@ -129,6 +185,7 @@ def edit_task(task_id):
 
 
 @app.route('/delete/<int:task_id>', methods=['GET', 'POST', 'DELETE'])
+@user_only
 def delete_task(task_id):
     print(task_id)
     try:
@@ -142,7 +199,9 @@ def delete_task(task_id):
 
 @app.route('/logout')
 def logout():
-    pass
+    logout_user()
+    return redirect(url_for('home'))
+
 
 
 if __name__ == "__main__":

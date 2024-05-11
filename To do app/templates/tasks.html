@@ -5,7 +5,7 @@
 <!--TODO: Display the user's name in the h1 title-->
 
 <div class="box">
-  <h1>Welcome, Name!</h1>
+  <h1>Welcome, {{ current_user.name}}</h1>
   <form action="{{ url_for('tasks') }}" method="post" >
 <!--    <input name="description" type="text" placeholder="Task description" required>-->
 <!--    <input name="date" type="date" placeholder="Date format MM/DD/YYYY" required>-->

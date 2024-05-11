@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField,BooleanField
+from wtforms import StringField, SubmitField, DateField,BooleanField, EmailField,PasswordField
 from wtforms.validators import DataRequired
 
 # top section of task form
@@ -9,3 +9,13 @@ class TaskForm(FlaskForm):
     reminder = BooleanField("Reminder")
     submit = SubmitField("Submit task")
 
+class RegisterUserForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    email = EmailField("Email", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Register")
+
+class LoginForm(FlaskForm):
+    email = EmailField("Email", validators=[DataRequired()])
+    password = PasswordField("Password",validators=[DataRequired()])
+    submit = SubmitField("Login")
