@@ -21,6 +21,8 @@
 <!--      Let me in.-->
 <!--    </button>-->
       {{ render_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+<!--    hides the password field input-->
+      {{ form.hidden_tag() }}
 
   </form>
 </div>

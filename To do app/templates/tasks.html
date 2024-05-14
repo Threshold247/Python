@@ -32,13 +32,16 @@
   </thead>
 
   <tbody>
+
     {% for task in tasks %}
+
+    {% if task.user_id == current_user.id %}
     {% if task.reminder: %}
     <tr class="table-success">
     {% else: %}
     <tr>
     {% endif %}
-      <th scope="row" >{{ task.id }}</th>
+      <td scope="row" ></td>
       <td>{{ task.description }}</td>
       <td>{{ task.date }}</td>
       <td>
@@ -48,6 +51,7 @@
           <a class="btn btn-danger" href="{{ url_for('delete_task', task_id=task.id) }}"> x</a>
       </td>
     </tr>
+     {% endif %}
      {% endfor %}
   </tbody>
 

@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, url_for, redirect, flash,abor
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from forms import TaskForm, RegisterUserForm, LoginForm
@@ -33,19 +33,13 @@ class Base(DeclarativeBase):
     pass
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URI','sqlite:///tasks.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URI','sqlite:///task_app.db')
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
 
 # CREATE TABLE IN DB
 # New addition is the UserMixin
-class Task(db.Model):
-    __tablename__ = "tasks"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    description: Mapped[str] = mapped_column(String(100))
-    date: Mapped[str] = mapped_column(String(100))
-    reminder: Mapped[bool] = mapped_column()
 
 class User(UserMixin, db.Model):
     __tablename__ = "user"
@@ -53,6 +47,19 @@ class User(UserMixin, db.Model):
     email: Mapped[str] = mapped_column(String(100), unique=True)
     password: Mapped[str] = mapped_column(String(100))
     name: Mapped[str] = mapped_column(String(100))
+    # This will act like a List of Task objects attached to each User.
+    task_list = relationship("Task", back_populates="tasks")
+
+class Task(db.Model):
+    __tablename__ = "tasks"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    description: Mapped[str] = mapped_column(String(100))
+    date: Mapped[str] = mapped_column(String(100))
+    reminder: Mapped[bool] = mapped_column()
+    # Create Foreign Key
+    user_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("user.id"))
+    # Create reference to the User object.
+    tasks = relationship("User", back_populates="task_list")
 
 
 with app.app_context():
@@ -61,6 +68,7 @@ with app.app_context():
 # Create user only decorator
 def user_only(f):
     @wraps(f)
+    @login_required
     def decorated_function(*args, **kwargs):
         # if the user is registered
         if not current_user.is_authenticated:
@@ -124,8 +132,9 @@ def tasks():
     # reminder button to highlight task
     # list all tasks on database
     form = TaskForm()
-    task_list = db.session.execute(db.select(Task)).scalars()
+    task_list = db.session.execute(db.select(Task)).scalars().all()
 
+    print(task_list)
     if form.validate_on_submit():
         #check_reminder = request.form.get("reminder")
         check_reminder = form.reminder.data
@@ -143,7 +152,8 @@ def tasks():
         add_task = Task(
             description = form.description.data,
             date = form.task_date.data,
-            reminder = check_reminder
+            reminder = check_reminder,
+            user_id = current_user.id
         )
         db.session.add(add_task)
         db.session.commit()
